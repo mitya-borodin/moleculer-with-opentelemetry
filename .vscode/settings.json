@@ -1,0 +1,239 @@
+{
+  "workbench.editor.revealIfOpen": true,
+  "workbench.startupEditor": "newUntitledFile",
+  "workbench.colorTheme": "One Dark Pro",
+  "workbench.iconTheme": "material-icon-theme",
+
+  "search.followSymlinks": false,
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/dist": true,
+    "**/coverage": true
+  },
+
+  "npm.packageManager": "yarn",
+
+  "files.autoSave": "afterDelay",
+  "files.associations": {
+    "*.ts": "typescript",
+    "*.tsx": "typescript",
+    "*.css": "tailwindcss"
+  },
+  "files.autoGuessEncoding": true,
+
+  "editor.formatOnSave": true,
+  "editor.accessibilitySupport": "off",
+  "editor.wordWrap": "on",
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "never",
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll": "explicit",
+    "source.fixAll.stylelint": "explicit"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[dotenv]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "editor.minimap.enabled": false,
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "tailwindCSS.includeLanguages": {
+    "plaintext": "html"
+  },
+
+  "yaml.format.singleQuote": true,
+
+  "diffEditor.ignoreTrimWhitespace": true,
+  "diffEditor.wordWrap": "off",
+
+  "html.format.indentHandlebars": true,
+  "html.format.indentInnerHtml": true,
+  "html.format.templating": true,
+
+  "eslint.validate": ["javascript", "typescript"],
+  "eslint.format.enable": true,
+  "eslint.lintTask.enable": true,
+  // "eslint.workingDirectories": ["./mett", "./rayner"],
+
+  "git.confirmSync": false,
+  "git.enableStatusBarSync": true,
+  "git.enableSmartCommit": true,
+  "git.showProgress": true,
+  "git.autofetch": true,
+  "git.showPushSuccessNotification": true,
+
+  "githubPullRequests.remotes": ["origin"],
+
+  "gitlens.hovers.currentLine.over": "line",
+  "gitlens.views.repositories.files.layout": "tree",
+  "gitlens.codeLens.scopes": ["document", "containers"],
+
+  "markdown.extension.tableFormatter.normalizeIndentation": true,
+
+  "typescript.referencesCodeLens.enabled": true,
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.preferences.importModuleSpecifierEnding": "minimal",
+
+  "javascript.preferences.importModuleSpecifierEnding": "minimal",
+  "javascript.preferences.importModuleSpecifier": "project-relative",
+
+  "shellformat.useEditorConfig": true,
+
+  "scss.validate": false,
+  "less.validate": false,
+
+  "better-comments.tags": [
+    {
+      "bold": false,
+      "color": "#FF2D00",
+      "italic": false,
+      "strikethrough": false,
+      "tag": "!",
+      "underline": false,
+      "backgroundColor": "transparent"
+    },
+    {
+      "bold": false,
+      "color": "#3498DB",
+      "italic": false,
+      "strikethrough": false,
+      "tag": "?",
+      "underline": false,
+      "backgroundColor": "transparent"
+    },
+    {
+      "bold": false,
+      "color": "#474747",
+      "italic": false,
+      "strikethrough": true,
+      "tag": "//",
+      "underline": false,
+      "backgroundColor": "transparent"
+    },
+    {
+      "bold": false,
+      "color": "#FF8C00",
+      "italic": false,
+      "strikethrough": false,
+      "tag": "todo",
+      "underline": false,
+      "backgroundColor": "transparent"
+    },
+    {
+      "bold": false,
+      "color": "#98C379",
+      "italic": false,
+      "strikethrough": false,
+      "tag": "*",
+      "underline": false,
+      "backgroundColor": "transparent"
+    }
+  ],
+  "cSpell.words": [
+    "abortable",
+    "disabilityinstallationtypesdictionaryid",
+    "Dmitriy",
+    "EBUS",
+    "employeeid",
+    "fingerprintjs",
+    "geetest",
+    "Gitea",
+    "GPIO",
+    "headlessui",
+    "heroicons",
+    "hyperion",
+    "ifup",
+    "inet",
+    "Mett",
+    "mitya",
+    "modbus",
+    "MOSQUITTO",
+    "MRPS",
+    "MRWL",
+    "objectd",
+    "oksm",
+    "oksmdictionaryid",
+    "opentelemetry",
+    "OPENTHERM",
+    "otpauth",
+    "Pino",
+    "qrcode",
+    "rethinkdb",
+    "Setpoint",
+    "sharedb",
+    "Sider",
+    "Tailscale",
+    "totp",
+    "WBIO",
+    "wireframe",
+    "Wireframes",
+    "wirenboard",
+    "Zigbee",
+    "Zipkin",
+    "автокомплита",
+    "агрились",
+    "дебонсить",
+    "захардкоженная",
+    "коммуницирует",
+    "контрол",
+    "контрола",
+    "контролам",
+    "контролами",
+    "контролах",
+    "контролом",
+    "контролу",
+    "легаси",
+    "лейблам",
+    "лейблов",
+    "Лейблу",
+    "Лейблы",
+    "мапим",
+    "Пресет",
+    "пресета",
+    "пресетах",
+    "пресетов",
+    "рантайме",
+    "рендере",
+    "сетапа",
+    "хардкодить"
+  ],
+  "[hosts]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  }
+}

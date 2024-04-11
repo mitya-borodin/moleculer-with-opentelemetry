@@ -1,0 +1,104 @@
+version: "3.3"
+
+services:
+  api:
+    build:
+      context: .
+    image: moleculer
+    env_file: docker-compose.env
+    environment:
+      SERVICES: api
+      PORT: 3000
+    depends_on:
+      - redis
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api-gw.rule=PathPrefix(`/`)"
+      - "traefik.http.services.api-gw.loadbalancer.server.port=3000"
+    networks:
+      - internal
+
+  service-a:
+    build:
+      context: .
+    image: moleculer
+    env_file: docker-compose.env
+    environment:
+      SERVICES: service-a
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - internal
+
+  service-b:
+    build:
+      context: .
+    image: moleculer
+    env_file: docker-compose.env
+    environment:
+      SERVICES: service-b
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - internal
+
+  service-c:
+    build:
+      context: .
+    image: moleculer
+    env_file: docker-compose.env
+    environment:
+      SERVICES: service-c
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - internal
+
+  service-d:
+    build:
+      context: .
+    image: moleculer
+    env_file: docker-compose.env
+    environment:
+      SERVICES: service-d
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - internal
+
+  mongo:
+    image: mongo:4
+    volumes:
+      - data:/data/db
+    networks:
+      - internal
+
+  redis:
+    image: redis:alpine
+    networks:
+      - internal
+
+  traefik:
+    image: traefik:v2.4
+    command:
+      - "--api.insecure=true" # Don't do that in production!
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+    ports:
+      - 3000:80
+      - 3001:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - internal
+      - default
+
+networks:
+  internal:
+
+volumes:
+  data:
