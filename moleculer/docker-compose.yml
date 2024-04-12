@@ -18,52 +18,52 @@ services:
     networks:
       - internal
 
-  service-a:
+  product:
     build:
       context: .
     image: moleculer
     env_file: docker-compose.env
     environment:
-      SERVICES: service-a
+      SERVICES: product
     depends_on:
       - mongo
       - redis
     networks:
       - internal
 
-  service-b:
+  cart:
     build:
       context: .
     image: moleculer
     env_file: docker-compose.env
     environment:
-      SERVICES: service-b
+      SERVICES: cart
     depends_on:
       - mongo
       - redis
     networks:
       - internal
 
-  service-c:
+  order:
     build:
       context: .
     image: moleculer
     env_file: docker-compose.env
     environment:
-      SERVICES: service-c
+      SERVICES: order
     depends_on:
       - mongo
       - redis
     networks:
       - internal
 
-  service-d:
+  partner:
     build:
       context: .
     image: moleculer
     env_file: docker-compose.env
     environment:
-      SERVICES: service-d
+      SERVICES: partner
     depends_on:
       - mongo
       - redis
@@ -82,6 +82,18 @@ services:
     networks:
       - internal
 
+  rabbitmq:
+    image: rabbitmq:3.13.1
+    container_name: "rabbitmq"
+    ports:
+      - 5673:5672
+      - 15673:15672
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq/
+      - rabbitmq_logs:/var/log/rabbitmq
+    networks:
+      - internal
+
   traefik:
     image: traefik:v2.4
     command:
@@ -97,8 +109,31 @@ services:
       - internal
       - default
 
+  # The zipkin process services the UI, and also exposes a POST endpoint that
+  # instrumentation can send trace data to. Scribe is enabled by default.
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    # Environment settings are defined here https://github.com/openzipkin/zipkin/blob/master/zipkin-server/README.md#environment-variables
+    environment:
+      - STORAGE_TYPE=mem
+      # Uncomment to disable scribe
+      # - SCRIBE_ENABLED=false
+      # Uncomment to enable self-tracing
+      # - SELF_TRACING_ENABLED=true
+      # Uncomment to enable debug logging
+      # - JAVA_OPTS=-Dlogging.level.zipkin=DEBUG
+    ports:
+      # Port used for the Zipkin UI and HTTP Api
+      - 9411:9411
+    networks:
+      - internal
+      - default
+
 networks:
   internal:
 
 volumes:
   data:
+  rabbitmq_data:
+  rabbitmq_logs:
