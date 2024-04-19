@@ -19,38 +19,7 @@ module.exports = {
 	/**
 	 * Actions
 	 */
-	actions: {
-		/**
-		 * Say a 'Hello' action.
-		 *
-		 * @returns
-		 */
-		hello: {
-			rest: {
-				method: "GET",
-				path: "/hello",
-			},
-			async handler() {
-				return "Hello Moleculer";
-			},
-		},
-
-		/**
-		 * Welcome, a username
-		 *
-		 * @param {String} name - User name
-		 */
-		welcome: {
-			rest: "/welcome",
-			params: {
-				name: "string",
-			},
-			/** @param {Context} ctx  */
-			async handler(ctx) {
-				return `Welcome, ${ctx.params.name}`;
-			},
-		},
-	},
+	actions: {},
 
 	/**
 	 * Methods
@@ -63,9 +32,17 @@ module.exports = {
 		 */
 		async seedDB() {
 			await this.adapter.insertMany([
-				{ name: "Samsung Galaxy S10 Plus", quantity: 10, price: 704 },
-				{ name: "iPhone 11 Pro", quantity: 25, price: 999 },
-				{ name: "Huawei P30 Pro", quantity: 15, price: 679 },
+				{ name: "BQ 6430L Aurora 4/64 GB", quantity: 1, price: 100 },
+				{ name: "MAXVI MS531 1/8 GB", quantity: 2, price: 200 },
+				{ name: "BQ 6040L Magic 2/32 GB", quantity: 3, price: 300 },
+				{ name: "BQ 6630L Magic L 3/32 GB", quantity: 4, price: 350 },
+				{
+					name: "Black Fox B10 Fox 2/32 GB",
+					quantity: 5,
+					price: 400,
+				},
+				{ name: "F+ SA55 2/16 GB", quantity: 6, price: 450 },
+				{ name: "INOI 2 Lite 1/8 GB", quantity: 7, price: 500 },
 			]);
 		},
 	},

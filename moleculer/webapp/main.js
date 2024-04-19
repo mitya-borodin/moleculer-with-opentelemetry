@@ -22,6 +22,7 @@ const prepareClickEvent = () => {
 
 		console.log(output);
 	};
+
 	element.addEventListener("click", onClick);
 };
 
@@ -84,9 +85,12 @@ const app = createApp({
 		},
 		filteredApis() {
 			const s = this.apiSearchText.toLocaleLowerCase();
-			if (!this.apiSearchText) return this.requests;
-			else {
+
+			if (!this.apiSearchText) {
+				return this.requests;
+			} else {
 				const reqs = {};
+
 				for (const key in this.requests)
 					reqs[key] = this.requests[key].filter(
 						(r) =>
@@ -107,6 +111,7 @@ const app = createApp({
 				password: "",
 				token: "",
 			};
+
 			this.saveAuthorize();
 		},
 		authorize() {
@@ -119,6 +124,7 @@ const app = createApp({
 			}).then((res) => {
 				if (res.status == 401) {
 					this.openAuthorizeDialog = true;
+
 					alert("Invalid username or password");
 				} else if (res.status == 200)
 					res.json().then((data) => {
@@ -126,7 +132,6 @@ const app = createApp({
 							res.headers.get("Authorization") || data.token;
 						this.auth.tenant =
 							res.headers.get("x-tenant-id") || data.tenant;
-						// this.saveAuthorize();
 					});
 				else alert("Not authorized");
 			});
@@ -135,7 +140,9 @@ const app = createApp({
 			this.globalAuth = {
 				...this.auth,
 			};
+
 			localStorage.setItem("globalAuth", JSON.stringify(this.globalAuth));
+
 			this.openAuthorizeDialog = false;
 		},
 		refreshApiPage() {
@@ -149,9 +156,14 @@ const app = createApp({
 		},
 		changePage(page) {
 			this.page = page;
+
 			localStorage.setItem("lastPage", this.page);
-			if (this.page == "apis") return this.updateServiceList();
-			else this.updatePageResources();
+
+			if (this.page == "apis") {
+				return this.updateServiceList();
+			} else {
+				this.updatePageResources();
+			}
 		},
 		humanize(ms) {
 			return ms > 1500 ? (ms / 1500).toFixed(2) + " s" : ms + " ms";
@@ -164,18 +176,24 @@ const app = createApp({
 		getActionParams(action, maxLen) {
 			if (action.action && action.action.params) {
 				const s = Object.keys(action.action.params).join(", ");
+
 				return s.length > maxLen ? s.substr(0, maxLen) + "\u2026" : s;
 			}
+
 			return "-";
 		},
 		getActionREST(svc, action) {
 			if (action.action.rest) {
 				let prefix = svc.fullName || svc.name;
-				if (typeof svc.settings.rest == "string")
+
+				if (typeof svc.settings.rest == "string") {
 					prefix = svc.settings.rest;
+				}
+
 				if (typeof action.action.rest == "string") {
 					if (action.action.rest.indexOf(" ") !== -1) {
 						const p = action.action.rest.split(" ");
+
 						return (
 							"<span class='badge'>" +
 							p[0] +
@@ -183,13 +201,14 @@ const app = createApp({
 							prefix +
 							p[1]
 						);
-					} else
+					} else {
 						return (
 							"<span class='badge'>*</span> " +
 							prefix +
 							action.action.rest
 						);
-				} else
+					}
+				} else {
 					return (
 						"<span class='badge'>" +
 						(action.action.rest.method || "*") +
@@ -197,27 +216,40 @@ const app = createApp({
 						prefix +
 						action.action.rest.path
 					);
+				}
 			}
 			return "";
 		},
 		getRest(item) {
-			if (!item.rest) return item.rest;
-			if (typeof item.rest === "object") return item.rest; // REST object
+			if (!item.rest) {
+				return item.rest;
+			}
+
+			if (typeof item.rest === "object") {
+				return item.rest;
+			}
+
 			if (item.rest.indexOf(" ") !== -1) {
 				const p = item.rest.split(" ");
+
 				return {
 					method: p[0],
 					path: p[1],
 				};
-			} else
+			} else {
 				return {
 					method: "*",
 					path: item.rest,
 				};
+			}
 		},
 		getFields(item, method, url) {
-			if (!item.params) return [];
+			if (!item.params) {
+				return [];
+			}
+
 			const r = [];
+
 			for (const key in item.params) {
 				if (key.startsWith("$")) continue;
 				if (item.params[key].readonly === true) continue;
@@ -459,13 +491,21 @@ const app = createApp({
 	},
 	mounted() {
 		const page = localStorage.getItem("lastPage");
+
 		this.page = page ? page : "home";
-		if (this.page === "apis") this.refreshApiPage();
+
+		if (this.page === "apis") {
+			this.refreshApiPage();
+		}
+
 		const globalAuth = localStorage.getItem("globalAuth");
+
 		this.globalAuth = globalAuth ? JSON.parse(globalAuth) : {};
+
 		setInterval(() => {
 			this.updatePageResources();
 		}, 2000);
+
 		this.updateBrokerOptions();
 	},
 });

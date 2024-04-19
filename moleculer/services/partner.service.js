@@ -12,74 +12,50 @@ module.exports = {
 	name: "partner",
 
 	/**
-	 * Mixins
-	 */
-	mixins: [DbMixin("partner")],
-
-	/**
 	 * Actions
 	 */
 	actions: {
-		/**
-		 * The "moleculer-db" mixin registers the following actions:
-		 *  - list
-		 *  - find
-		 *  - count
-		 *  - create
-		 *  - insert
-		 *  - update
-		 *  - remove
-		 */
-
-		// --- ADDITIONAL ACTIONS ---
-
-		/**
-		 * Increase the quantity of the product item.
-		 */
-		increaseQuantity: {
-			rest: "PUT /:id/quantity/increase",
+		delivery: {
+			rest: {
+				method: "POST",
+			},
 			params: {
-				id: "string",
-				value: "number|integer|positive",
+				products: "array",
 			},
-			/** @param {Context} ctx */
 			async handler(ctx) {
-				const doc = await this.adapter.updateById(ctx.params.id, {
-					$inc: { quantity: ctx.params.value },
+				this.logger.info("Start delivery 🚀");
+				this.logger.info({ products: ctx.params.products });
+
+				const spanDelivery = ctx.startSpan("check-delivery", {
+					tags: ["partner", "delivery", "car"],
+					products: ctx.params.products,
 				});
-				const json = await this.transformDocuments(
-					ctx,
-					ctx.params,
-					doc
-				);
-				await this.entityChanged("updated", json, ctx);
 
-				return json;
-			},
-		},
-
-		/**
-		 * Decrease the quantity of the product item.
-		 */
-		decreaseQuantity: {
-			rest: "PUT /:id/quantity/decrease",
-			params: {
-				id: "string",
-				value: "number|integer|positive",
-			},
-			/** @param {Context} ctx  */
-			async handler(ctx) {
-				const doc = await this.adapter.updateById(ctx.params.id, {
-					$inc: { quantity: -ctx.params.value },
+				await new this.Promise((resolve) => {
+					setTimeout(resolve, 500);
 				});
-				const json = await this.transformDocuments(
-					ctx,
-					ctx.params,
-					doc
-				);
-				await this.entityChanged("updated", json, ctx);
 
-				return json;
+				ctx.finishSpan(spanDelivery);
+
+				const spanDb = ctx.startSpan("save-to-db", {
+					tags: ["db", "mongo", "postgres"],
+				});
+
+				await new this.Promise((resolve) => {
+					setTimeout(resolve, 1500);
+				});
+
+				ctx.finishSpan(spanDb);
+
+				const spanRabbitMQ = ctx.startSpan("emit-to-rabbitMQ", {
+					tags: ["mq", "rabbitMQ", "bus"],
+				});
+
+				await new this.Promise((resolve) => {
+					setTimeout(resolve, 750);
+				});
+
+				ctx.finishSpan(spanRabbitMQ);
 			},
 		},
 	},
