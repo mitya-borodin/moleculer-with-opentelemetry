@@ -1,32 +1,14 @@
-import { context, propagation, trace } from "@opentelemetry/api";
+import {
+	SpanStatusCode,
+	context,
+	propagation,
+	trace,
+} from "@opentelemetry/api";
 
+/**
+ * Получения трейсера
+ */
 const tracer = trace.getTracer("example-tracer-web");
-
-const prepareClickEvent = () => {
-	const element = document.getElementById("button1");
-
-	const onClick = () => {
-		const span = tracer.startSpan("foo");
-
-		span.setAttribute("atr-1", "value-1");
-		span.setAttribute("atr-2", "value-2");
-		span.setAttribute("atr-3", "value-3");
-
-		span.end();
-
-		console.log(context.active());
-
-		const output = {};
-
-		propagation.inject(context.active(), output);
-
-		console.log(output);
-	};
-
-	element.addEventListener("click", onClick);
-};
-
-window.addEventListener("load", prepareClickEvent);
 
 const { createApp } = Vue;
 
@@ -77,6 +59,7 @@ const app = createApp({
 			services: [],
 			actions: {},
 			showBrokerOptions: false,
+			products: [],
 		};
 	},
 	computed: {
@@ -487,6 +470,72 @@ const app = createApp({
 		updatePageResources() {
 			if (this.page == "nodes") return this.updateNodeList();
 			if (this.page == "services") return this.updateServiceList();
+		},
+
+		call(path, method, body) {
+			/**
+			 * В HTTP клиенте необходимо достать контекст трассировки.
+			 */
+			const headers = {
+				"Content-Type": "application/json",
+			};
+
+			propagation.inject(context.active(), headers);
+
+			console.log(headers);
+
+			return fetch(window.location.origin + path, {
+				method,
+				body: body ? JSON.stringify(body) : null,
+				headers,
+			})
+				.then((response) => response.json())
+				.catch((error) => {
+					console.error(error);
+
+					return {};
+				});
+		},
+
+		async getProducts() {
+			const parent = tracer.startSpan("get-products");
+
+			parent.setAttribute("atr-1", "value-1");
+			parent.setAttribute("atr-2", "value-2");
+			parent.setAttribute("atr-3", "value-3");
+
+			try {
+				parent.spanContext();
+
+				/**
+				 * Пример создания иерархии спанов.
+				 */
+				const traceContext = trace.setSpan(context.active(), parent);
+				const child = tracer.startSpan(
+					"wait-before-get-products",
+					undefined,
+					traceContext
+				);
+
+				await new Promise((resolve) => {
+					setTimeout(resolve, 1000);
+				});
+
+				child.addEvent("The waiting before get product finished");
+				child.setStatus(SpanStatusCode.OK);
+				child.end();
+
+				const { rows } = await this.call("/api/product", "GET");
+
+				this.data.products = rows;
+
+				parent.addEvent("The product getting is done");
+				parent.setStatus(SpanStatusCode.OK);
+			} catch (error) {
+				parent.setStatus(SpanStatusCode.ERROR);
+			} finally {
+				parent.end();
+			}
 		},
 	},
 	mounted() {

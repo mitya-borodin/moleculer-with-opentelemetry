@@ -142,7 +142,448 @@
       this[globalName] = mainExports;
     }
   }
-})({"kRfeB":[function(require,module,exports) {
+})({"AscjC":[function(require,module,exports) {
+var global = arguments[3];
+var HMR_HOST = null;
+var HMR_PORT = null;
+var HMR_SECURE = false;
+var HMR_ENV_HASH = "d6ea1d42532a7575";
+var HMR_USE_SSE = false;
+module.bundle.HMR_BUNDLE_ID = "5aea5272b8ff9365";
+"use strict";
+/* global HMR_HOST, HMR_PORT, HMR_ENV_HASH, HMR_SECURE, HMR_USE_SSE, chrome, browser, __parcel__import__, __parcel__importScripts__, ServiceWorkerGlobalScope */ /*::
+import type {
+  HMRAsset,
+  HMRMessage,
+} from '@parcel/reporter-dev-server/src/HMRServer.js';
+interface ParcelRequire {
+  (string): mixed;
+  cache: {|[string]: ParcelModule|};
+  hotData: {|[string]: mixed|};
+  Module: any;
+  parent: ?ParcelRequire;
+  isParcelRequire: true;
+  modules: {|[string]: [Function, {|[string]: string|}]|};
+  HMR_BUNDLE_ID: string;
+  root: ParcelRequire;
+}
+interface ParcelModule {
+  hot: {|
+    data: mixed,
+    accept(cb: (Function) => void): void,
+    dispose(cb: (mixed) => void): void,
+    // accept(deps: Array<string> | string, cb: (Function) => void): void,
+    // decline(): void,
+    _acceptCallbacks: Array<(Function) => void>,
+    _disposeCallbacks: Array<(mixed) => void>,
+  |};
+}
+interface ExtensionContext {
+  runtime: {|
+    reload(): void,
+    getURL(url: string): string;
+    getManifest(): {manifest_version: number, ...};
+  |};
+}
+declare var module: {bundle: ParcelRequire, ...};
+declare var HMR_HOST: string;
+declare var HMR_PORT: string;
+declare var HMR_ENV_HASH: string;
+declare var HMR_SECURE: boolean;
+declare var HMR_USE_SSE: boolean;
+declare var chrome: ExtensionContext;
+declare var browser: ExtensionContext;
+declare var __parcel__import__: (string) => Promise<void>;
+declare var __parcel__importScripts__: (string) => Promise<void>;
+declare var globalThis: typeof self;
+declare var ServiceWorkerGlobalScope: Object;
+*/ var OVERLAY_ID = "__parcel__error__overlay__";
+var OldModule = module.bundle.Module;
+function Module(moduleName) {
+    OldModule.call(this, moduleName);
+    this.hot = {
+        data: module.bundle.hotData[moduleName],
+        _acceptCallbacks: [],
+        _disposeCallbacks: [],
+        accept: function(fn) {
+            this._acceptCallbacks.push(fn || function() {});
+        },
+        dispose: function(fn) {
+            this._disposeCallbacks.push(fn);
+        }
+    };
+    module.bundle.hotData[moduleName] = undefined;
+}
+module.bundle.Module = Module;
+module.bundle.hotData = {};
+var checkedAssets /*: {|[string]: boolean|} */ , assetsToDispose /*: Array<[ParcelRequire, string]> */ , assetsToAccept /*: Array<[ParcelRequire, string]> */ ;
+function getHostname() {
+    return HMR_HOST || (location.protocol.indexOf("http") === 0 ? location.hostname : "localhost");
+}
+function getPort() {
+    return HMR_PORT || location.port;
+}
+// eslint-disable-next-line no-redeclare
+var parent = module.bundle.parent;
+if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== "undefined") {
+    var hostname = getHostname();
+    var port = getPort();
+    var protocol = HMR_SECURE || location.protocol == "https:" && ![
+        "localhost",
+        "127.0.0.1",
+        "0.0.0.0"
+    ].includes(hostname) ? "wss" : "ws";
+    var ws;
+    if (HMR_USE_SSE) ws = new EventSource("/__parcel_hmr");
+    else try {
+        ws = new WebSocket(protocol + "://" + hostname + (port ? ":" + port : "") + "/");
+    } catch (err) {
+        if (err.message) console.error(err.message);
+        ws = {};
+    }
+    // Web extension context
+    var extCtx = typeof browser === "undefined" ? typeof chrome === "undefined" ? null : chrome : browser;
+    // Safari doesn't support sourceURL in error stacks.
+    // eval may also be disabled via CSP, so do a quick check.
+    var supportsSourceURL = false;
+    try {
+        (0, eval)('throw new Error("test"); //# sourceURL=test.js');
+    } catch (err) {
+        supportsSourceURL = err.stack.includes("test.js");
+    }
+    // $FlowFixMe
+    ws.onmessage = async function(event /*: {data: string, ...} */ ) {
+        checkedAssets = {} /*: {|[string]: boolean|} */ ;
+        assetsToAccept = [];
+        assetsToDispose = [];
+        var data /*: HMRMessage */  = JSON.parse(event.data);
+        if (data.type === "update") {
+            // Remove error overlay if there is one
+            if (typeof document !== "undefined") removeErrorOverlay();
+            let assets = data.assets.filter((asset)=>asset.envHash === HMR_ENV_HASH);
+            // Handle HMR Update
+            let handled = assets.every((asset)=>{
+                return asset.type === "css" || asset.type === "js" && hmrAcceptCheck(module.bundle.root, asset.id, asset.depsByBundle);
+            });
+            if (handled) {
+                console.clear();
+                // Dispatch custom event so other runtimes (e.g React Refresh) are aware.
+                if (typeof window !== "undefined" && typeof CustomEvent !== "undefined") window.dispatchEvent(new CustomEvent("parcelhmraccept"));
+                await hmrApplyUpdates(assets);
+                // Dispose all old assets.
+                let processedAssets = {} /*: {|[string]: boolean|} */ ;
+                for(let i = 0; i < assetsToDispose.length; i++){
+                    let id = assetsToDispose[i][1];
+                    if (!processedAssets[id]) {
+                        hmrDispose(assetsToDispose[i][0], id);
+                        processedAssets[id] = true;
+                    }
+                }
+                // Run accept callbacks. This will also re-execute other disposed assets in topological order.
+                processedAssets = {};
+                for(let i = 0; i < assetsToAccept.length; i++){
+                    let id = assetsToAccept[i][1];
+                    if (!processedAssets[id]) {
+                        hmrAccept(assetsToAccept[i][0], id);
+                        processedAssets[id] = true;
+                    }
+                }
+            } else fullReload();
+        }
+        if (data.type === "error") {
+            // Log parcel errors to console
+            for (let ansiDiagnostic of data.diagnostics.ansi){
+                let stack = ansiDiagnostic.codeframe ? ansiDiagnostic.codeframe : ansiDiagnostic.stack;
+                console.error("\uD83D\uDEA8 [parcel]: " + ansiDiagnostic.message + "\n" + stack + "\n\n" + ansiDiagnostic.hints.join("\n"));
+            }
+            if (typeof document !== "undefined") {
+                // Render the fancy html overlay
+                removeErrorOverlay();
+                var overlay = createErrorOverlay(data.diagnostics.html);
+                // $FlowFixMe
+                document.body.appendChild(overlay);
+            }
+        }
+    };
+    if (ws instanceof WebSocket) {
+        ws.onerror = function(e) {
+            if (e.message) console.error(e.message);
+        };
+        ws.onclose = function() {
+            console.warn("[parcel] \uD83D\uDEA8 Connection to the HMR server was lost");
+        };
+    }
+}
+function removeErrorOverlay() {
+    var overlay = document.getElementById(OVERLAY_ID);
+    if (overlay) {
+        overlay.remove();
+        console.log("[parcel] \u2728 Error resolved");
+    }
+}
+function createErrorOverlay(diagnostics) {
+    var overlay = document.createElement("div");
+    overlay.id = OVERLAY_ID;
+    let errorHTML = '<div style="background: black; opacity: 0.85; font-size: 16px; color: white; position: fixed; height: 100%; width: 100%; top: 0px; left: 0px; padding: 30px; font-family: Menlo, Consolas, monospace; z-index: 9999;">';
+    for (let diagnostic of diagnostics){
+        let stack = diagnostic.frames.length ? diagnostic.frames.reduce((p, frame)=>{
+            return `${p}
+<a href="/__parcel_launch_editor?file=${encodeURIComponent(frame.location)}" style="text-decoration: underline; color: #888" onclick="fetch(this.href); return false">${frame.location}</a>
+${frame.code}`;
+        }, "") : diagnostic.stack;
+        errorHTML += `
+      <div>
+        <div style="font-size: 18px; font-weight: bold; margin-top: 20px;">
+          \u{1F6A8} ${diagnostic.message}
+        </div>
+        <pre>${stack}</pre>
+        <div>
+          ${diagnostic.hints.map((hint)=>"<div>\uD83D\uDCA1 " + hint + "</div>").join("")}
+        </div>
+        ${diagnostic.documentation ? `<div>\u{1F4DD} <a style="color: violet" href="${diagnostic.documentation}" target="_blank">Learn more</a></div>` : ""}
+      </div>
+    `;
+    }
+    errorHTML += "</div>";
+    overlay.innerHTML = errorHTML;
+    return overlay;
+}
+function fullReload() {
+    if ("reload" in location) location.reload();
+    else if (extCtx && extCtx.runtime && extCtx.runtime.reload) extCtx.runtime.reload();
+}
+function getParents(bundle, id) /*: Array<[ParcelRequire, string]> */ {
+    var modules = bundle.modules;
+    if (!modules) return [];
+    var parents = [];
+    var k, d, dep;
+    for(k in modules)for(d in modules[k][1]){
+        dep = modules[k][1][d];
+        if (dep === id || Array.isArray(dep) && dep[dep.length - 1] === id) parents.push([
+            bundle,
+            k
+        ]);
+    }
+    if (bundle.parent) parents = parents.concat(getParents(bundle.parent, id));
+    return parents;
+}
+function updateLink(link) {
+    var href = link.getAttribute("href");
+    if (!href) return;
+    var newLink = link.cloneNode();
+    newLink.onload = function() {
+        if (link.parentNode !== null) // $FlowFixMe
+        link.parentNode.removeChild(link);
+    };
+    newLink.setAttribute("href", // $FlowFixMe
+    href.split("?")[0] + "?" + Date.now());
+    // $FlowFixMe
+    link.parentNode.insertBefore(newLink, link.nextSibling);
+}
+var cssTimeout = null;
+function reloadCSS() {
+    if (cssTimeout) return;
+    cssTimeout = setTimeout(function() {
+        var links = document.querySelectorAll('link[rel="stylesheet"]');
+        for(var i = 0; i < links.length; i++){
+            // $FlowFixMe[incompatible-type]
+            var href /*: string */  = links[i].getAttribute("href");
+            var hostname = getHostname();
+            var servedFromHMRServer = hostname === "localhost" ? new RegExp("^(https?:\\/\\/(0.0.0.0|127.0.0.1)|localhost):" + getPort()).test(href) : href.indexOf(hostname + ":" + getPort());
+            var absolute = /^https?:\/\//i.test(href) && href.indexOf(location.origin) !== 0 && !servedFromHMRServer;
+            if (!absolute) updateLink(links[i]);
+        }
+        cssTimeout = null;
+    }, 50);
+}
+function hmrDownload(asset) {
+    if (asset.type === "js") {
+        if (typeof document !== "undefined") {
+            let script = document.createElement("script");
+            script.src = asset.url + "?t=" + Date.now();
+            if (asset.outputFormat === "esmodule") script.type = "module";
+            return new Promise((resolve, reject)=>{
+                var _document$head;
+                script.onload = ()=>resolve(script);
+                script.onerror = reject;
+                (_document$head = document.head) === null || _document$head === void 0 || _document$head.appendChild(script);
+            });
+        } else if (typeof importScripts === "function") {
+            // Worker scripts
+            if (asset.outputFormat === "esmodule") return import(asset.url + "?t=" + Date.now());
+            else return new Promise((resolve, reject)=>{
+                try {
+                    importScripts(asset.url + "?t=" + Date.now());
+                    resolve();
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        }
+    }
+}
+async function hmrApplyUpdates(assets) {
+    global.parcelHotUpdate = Object.create(null);
+    let scriptsToRemove;
+    try {
+        // If sourceURL comments aren't supported in eval, we need to load
+        // the update from the dev server over HTTP so that stack traces
+        // are correct in errors/logs. This is much slower than eval, so
+        // we only do it if needed (currently just Safari).
+        // https://bugs.webkit.org/show_bug.cgi?id=137297
+        // This path is also taken if a CSP disallows eval.
+        if (!supportsSourceURL) {
+            let promises = assets.map((asset)=>{
+                var _hmrDownload;
+                return (_hmrDownload = hmrDownload(asset)) === null || _hmrDownload === void 0 ? void 0 : _hmrDownload.catch((err)=>{
+                    // Web extension fix
+                    if (extCtx && extCtx.runtime && extCtx.runtime.getManifest().manifest_version == 3 && typeof ServiceWorkerGlobalScope != "undefined" && global instanceof ServiceWorkerGlobalScope) {
+                        extCtx.runtime.reload();
+                        return;
+                    }
+                    throw err;
+                });
+            });
+            scriptsToRemove = await Promise.all(promises);
+        }
+        assets.forEach(function(asset) {
+            hmrApply(module.bundle.root, asset);
+        });
+    } finally{
+        delete global.parcelHotUpdate;
+        if (scriptsToRemove) scriptsToRemove.forEach((script)=>{
+            if (script) {
+                var _document$head2;
+                (_document$head2 = document.head) === null || _document$head2 === void 0 || _document$head2.removeChild(script);
+            }
+        });
+    }
+}
+function hmrApply(bundle /*: ParcelRequire */ , asset /*:  HMRAsset */ ) {
+    var modules = bundle.modules;
+    if (!modules) return;
+    if (asset.type === "css") reloadCSS();
+    else if (asset.type === "js") {
+        let deps = asset.depsByBundle[bundle.HMR_BUNDLE_ID];
+        if (deps) {
+            if (modules[asset.id]) {
+                // Remove dependencies that are removed and will become orphaned.
+                // This is necessary so that if the asset is added back again, the cache is gone, and we prevent a full page reload.
+                let oldDeps = modules[asset.id][1];
+                for(let dep in oldDeps)if (!deps[dep] || deps[dep] !== oldDeps[dep]) {
+                    let id = oldDeps[dep];
+                    let parents = getParents(module.bundle.root, id);
+                    if (parents.length === 1) hmrDelete(module.bundle.root, id);
+                }
+            }
+            if (supportsSourceURL) // Global eval. We would use `new Function` here but browser
+            // support for source maps is better with eval.
+            (0, eval)(asset.output);
+            // $FlowFixMe
+            let fn = global.parcelHotUpdate[asset.id];
+            modules[asset.id] = [
+                fn,
+                deps
+            ];
+        } else if (bundle.parent) hmrApply(bundle.parent, asset);
+    }
+}
+function hmrDelete(bundle, id) {
+    let modules = bundle.modules;
+    if (!modules) return;
+    if (modules[id]) {
+        // Collect dependencies that will become orphaned when this module is deleted.
+        let deps = modules[id][1];
+        let orphans = [];
+        for(let dep in deps){
+            let parents = getParents(module.bundle.root, deps[dep]);
+            if (parents.length === 1) orphans.push(deps[dep]);
+        }
+        // Delete the module. This must be done before deleting dependencies in case of circular dependencies.
+        delete modules[id];
+        delete bundle.cache[id];
+        // Now delete the orphans.
+        orphans.forEach((id)=>{
+            hmrDelete(module.bundle.root, id);
+        });
+    } else if (bundle.parent) hmrDelete(bundle.parent, id);
+}
+function hmrAcceptCheck(bundle /*: ParcelRequire */ , id /*: string */ , depsByBundle /*: ?{ [string]: { [string]: string } }*/ ) {
+    if (hmrAcceptCheckOne(bundle, id, depsByBundle)) return true;
+    // Traverse parents breadth first. All possible ancestries must accept the HMR update, or we'll reload.
+    let parents = getParents(module.bundle.root, id);
+    let accepted = false;
+    while(parents.length > 0){
+        let v = parents.shift();
+        let a = hmrAcceptCheckOne(v[0], v[1], null);
+        if (a) // If this parent accepts, stop traversing upward, but still consider siblings.
+        accepted = true;
+        else {
+            // Otherwise, queue the parents in the next level upward.
+            let p = getParents(module.bundle.root, v[1]);
+            if (p.length === 0) {
+                // If there are no parents, then we've reached an entry without accepting. Reload.
+                accepted = false;
+                break;
+            }
+            parents.push(...p);
+        }
+    }
+    return accepted;
+}
+function hmrAcceptCheckOne(bundle /*: ParcelRequire */ , id /*: string */ , depsByBundle /*: ?{ [string]: { [string]: string } }*/ ) {
+    var modules = bundle.modules;
+    if (!modules) return;
+    if (depsByBundle && !depsByBundle[bundle.HMR_BUNDLE_ID]) {
+        // If we reached the root bundle without finding where the asset should go,
+        // there's nothing to do. Mark as "accepted" so we don't reload the page.
+        if (!bundle.parent) return true;
+        return hmrAcceptCheck(bundle.parent, id, depsByBundle);
+    }
+    if (checkedAssets[id]) return true;
+    checkedAssets[id] = true;
+    var cached = bundle.cache[id];
+    assetsToDispose.push([
+        bundle,
+        id
+    ]);
+    if (!cached || cached.hot && cached.hot._acceptCallbacks.length) {
+        assetsToAccept.push([
+            bundle,
+            id
+        ]);
+        return true;
+    }
+}
+function hmrDispose(bundle /*: ParcelRequire */ , id /*: string */ ) {
+    var cached = bundle.cache[id];
+    bundle.hotData[id] = {};
+    if (cached && cached.hot) cached.hot.data = bundle.hotData[id];
+    if (cached && cached.hot && cached.hot._disposeCallbacks.length) cached.hot._disposeCallbacks.forEach(function(cb) {
+        cb(bundle.hotData[id]);
+    });
+    delete bundle.cache[id];
+}
+function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
+    // Execute the module.
+    bundle(id);
+    // Run the accept callbacks in the new version of the module.
+    var cached = bundle.cache[id];
+    if (cached && cached.hot && cached.hot._acceptCallbacks.length) cached.hot._acceptCallbacks.forEach(function(cb) {
+        var assetsToAlsoAccept = cb(function() {
+            return getParents(module.bundle.root, id);
+        });
+        if (assetsToAlsoAccept && assetsToAccept.length) {
+            assetsToAlsoAccept.forEach(function(a) {
+                hmrDispose(a[0], a[1]);
+            });
+            // $FlowFixMe[method-unbinding]
+            assetsToAccept.push.apply(assetsToAccept, assetsToAlsoAccept);
+        }
+    });
+}
+
+},{}],"kRfeB":[function(require,module,exports) {
 var _autoInstrumentationsWeb = require("@opentelemetry/auto-instrumentations-web");
 var _contextZone = require("@opentelemetry/context-zone");
 var _exporterZipkin = require("@opentelemetry/exporter-zipkin");
@@ -175,7 +616,7 @@ provider.register({
     ]
 });
 
-},{"@opentelemetry/sdk-trace-web":"eXZZL","@opentelemetry/context-zone":"cmUfS","@opentelemetry/instrumentation":"3OTpd","@opentelemetry/sdk-trace-base":"jj5uM","@opentelemetry/auto-instrumentations-web":"dZ0bF","@opentelemetry/exporter-zipkin":"8Sk0y","@opentelemetry/resources":"loqSh","@opentelemetry/semantic-conventions":"lCgfj"}],"eXZZL":[function(require,module,exports) {
+},{"@opentelemetry/auto-instrumentations-web":"dZ0bF","@opentelemetry/context-zone":"cmUfS","@opentelemetry/exporter-zipkin":"8Sk0y","@opentelemetry/instrumentation":"3OTpd","@opentelemetry/sdk-trace-base":"jj5uM","@opentelemetry/sdk-trace-web":"eXZZL","@opentelemetry/resources":"loqSh","@opentelemetry/semantic-conventions":"lCgfj"}],"dZ0bF":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -192,20 +633,10 @@ provider.register({
  * limitations under the License.
  */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-var _webTracerProvider = require("./WebTracerProvider");
-parcelHelpers.exportAll(_webTracerProvider, exports);
-var _stackContextManager = require("./StackContextManager");
-parcelHelpers.exportAll(_stackContextManager, exports);
-var _performanceTimingNames = require("./enums/PerformanceTimingNames");
-parcelHelpers.exportAll(_performanceTimingNames, exports);
-var _types = require("./types");
-parcelHelpers.exportAll(_types, exports);
+parcelHelpers.export(exports, "getWebAutoInstrumentations", ()=>(0, _utils.getWebAutoInstrumentations));
 var _utils = require("./utils");
-parcelHelpers.exportAll(_utils, exports);
-var _sdkTraceBase = require("@opentelemetry/sdk-trace-base");
-parcelHelpers.exportAll(_sdkTraceBase, exports);
 
-},{"./WebTracerProvider":"gYn17","./StackContextManager":"dXLQl","./enums/PerformanceTimingNames":"eNyqo","./types":"5dYQ0","./utils":"ccAWO","@opentelemetry/sdk-trace-base":"jj5uM","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"gYn17":[function(require,module,exports) {
+},{"./utils":"lSUFd","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"lSUFd":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -222,241 +653,49 @@ parcelHelpers.exportAll(_sdkTraceBase, exports);
  * limitations under the License.
  */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "WebTracerProvider", ()=>WebTracerProvider);
-var _sdkTraceBase = require("@opentelemetry/sdk-trace-base");
-var _stackContextManager = require("./StackContextManager");
-var __extends = undefined && undefined.__extends || function() {
-    var extendStatics = function(d, b) {
-        extendStatics = Object.setPrototypeOf || ({
-            __proto__: []
-        }) instanceof Array && function(d, b) {
-            d.__proto__ = b;
-        } || function(d, b) {
-            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
-        };
-        return extendStatics(d, b);
-    };
-    return function(d, b) {
-        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() {
-            this.constructor = d;
-        }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-}();
-/**
- * This class represents a web tracer with {@link StackContextManager}
- */ var WebTracerProvider = /** @class */ function(_super) {
-    __extends(WebTracerProvider, _super);
-    /**
-     * Constructs a new Tracer instance.
-     * @param config Web Tracer config
-     */ function WebTracerProvider(config) {
-        if (config === void 0) config = {};
-        var _this = _super.call(this, config) || this;
-        if (config.contextManager) throw "contextManager should be defined in register method not in constructor";
-        if (config.propagator) throw "propagator should be defined in register method not in constructor";
-        return _this;
-    }
-    /**
-     * Register this TracerProvider for use with the OpenTelemetry API.
-     * Undefined values may be replaced with defaults, and
-     * null values will be skipped.
-     *
-     * @param config Configuration object for SDK registration
-     */ WebTracerProvider.prototype.register = function(config) {
-        if (config === void 0) config = {};
-        if (config.contextManager === undefined) config.contextManager = new (0, _stackContextManager.StackContextManager)();
-        if (config.contextManager) config.contextManager.enable();
-        _super.prototype.register.call(this, config);
-    };
-    return WebTracerProvider;
-}((0, _sdkTraceBase.BasicTracerProvider));
-
-},{"@opentelemetry/sdk-trace-base":"jj5uM","./StackContextManager":"dXLQl","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"jj5uM":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _tracer = require("./Tracer");
-parcelHelpers.exportAll(_tracer, exports);
-var _basicTracerProvider = require("./BasicTracerProvider");
-parcelHelpers.exportAll(_basicTracerProvider, exports);
-var _platform = require("./platform");
-parcelHelpers.exportAll(_platform, exports);
-var _consoleSpanExporter = require("./export/ConsoleSpanExporter");
-parcelHelpers.exportAll(_consoleSpanExporter, exports);
-var _inMemorySpanExporter = require("./export/InMemorySpanExporter");
-parcelHelpers.exportAll(_inMemorySpanExporter, exports);
-var _readableSpan = require("./export/ReadableSpan");
-parcelHelpers.exportAll(_readableSpan, exports);
-var _simpleSpanProcessor = require("./export/SimpleSpanProcessor");
-parcelHelpers.exportAll(_simpleSpanProcessor, exports);
-var _spanExporter = require("./export/SpanExporter");
-parcelHelpers.exportAll(_spanExporter, exports);
-var _noopSpanProcessor = require("./export/NoopSpanProcessor");
-parcelHelpers.exportAll(_noopSpanProcessor, exports);
-var _alwaysOffSampler = require("./sampler/AlwaysOffSampler");
-parcelHelpers.exportAll(_alwaysOffSampler, exports);
-var _alwaysOnSampler = require("./sampler/AlwaysOnSampler");
-parcelHelpers.exportAll(_alwaysOnSampler, exports);
-var _parentBasedSampler = require("./sampler/ParentBasedSampler");
-parcelHelpers.exportAll(_parentBasedSampler, exports);
-var _traceIdRatioBasedSampler = require("./sampler/TraceIdRatioBasedSampler");
-parcelHelpers.exportAll(_traceIdRatioBasedSampler, exports);
-var _sampler = require("./Sampler");
-parcelHelpers.exportAll(_sampler, exports);
-var _span = require("./Span");
-parcelHelpers.exportAll(_span, exports);
-var _spanProcessor = require("./SpanProcessor");
-parcelHelpers.exportAll(_spanProcessor, exports);
-var _timedEvent = require("./TimedEvent");
-parcelHelpers.exportAll(_timedEvent, exports);
-var _types = require("./types");
-parcelHelpers.exportAll(_types, exports);
-var _idGenerator = require("./IdGenerator");
-parcelHelpers.exportAll(_idGenerator, exports);
-
-},{"./Tracer":"zYo79","./BasicTracerProvider":"bv1bF","./platform":"alGsY","./export/ConsoleSpanExporter":"hWVp2","./export/InMemorySpanExporter":"Yr1u5","./export/ReadableSpan":"fSt4P","./export/SimpleSpanProcessor":"Nq2MM","./export/SpanExporter":"lzLTj","./export/NoopSpanProcessor":"j2TGv","./sampler/AlwaysOffSampler":"9FEmX","./sampler/AlwaysOnSampler":"cnZtk","./sampler/ParentBasedSampler":"7pDAK","./sampler/TraceIdRatioBasedSampler":"bqqYo","./Sampler":"2IRN3","./Span":"3tWGt","./SpanProcessor":"iqrBb","./TimedEvent":"hdnwm","./types":"cwYEn","./IdGenerator":"iYvXX","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"zYo79":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Tracer", ()=>Tracer);
+parcelHelpers.export(exports, "getWebAutoInstrumentations", ()=>getWebAutoInstrumentations);
 var _api = require("@opentelemetry/api");
-var _core = require("@opentelemetry/core");
-var _span = require("./Span");
-var _utility = require("./utility");
-var _platform = require("./platform");
-/**
- * This class represents a basic tracer.
- */ var Tracer = /** @class */ function() {
-    /**
-     * Constructs a new Tracer instance.
-     */ function Tracer(instrumentationLibrary, config, _tracerProvider) {
-        this._tracerProvider = _tracerProvider;
-        var localConfig = (0, _utility.mergeConfig)(config);
-        this._sampler = localConfig.sampler;
-        this._generalLimits = localConfig.generalLimits;
-        this._spanLimits = localConfig.spanLimits;
-        this._idGenerator = config.idGenerator || new (0, _platform.RandomIdGenerator)();
-        this.resource = _tracerProvider.resource;
-        this.instrumentationLibrary = instrumentationLibrary;
+var _instrumentationDocumentLoad = require("@opentelemetry/instrumentation-document-load");
+var _instrumentationFetch = require("@opentelemetry/instrumentation-fetch");
+var _instrumentationUserInteraction = require("@opentelemetry/instrumentation-user-interaction");
+var _instrumentationXmlHttpRequest = require("@opentelemetry/instrumentation-xml-http-request");
+var InstrumentationMap = {
+    "@opentelemetry/instrumentation-document-load": (0, _instrumentationDocumentLoad.DocumentLoadInstrumentation),
+    "@opentelemetry/instrumentation-fetch": (0, _instrumentationFetch.FetchInstrumentation),
+    "@opentelemetry/instrumentation-user-interaction": (0, _instrumentationUserInteraction.UserInteractionInstrumentation),
+    "@opentelemetry/instrumentation-xml-http-request": (0, _instrumentationXmlHttpRequest.XMLHttpRequestInstrumentation)
+};
+function getWebAutoInstrumentations(inputConfigs) {
+    var _a;
+    if (inputConfigs === void 0) inputConfigs = {};
+    for(var _i = 0, _b = Object.keys(inputConfigs); _i < _b.length; _i++){
+        var name_1 = _b[_i];
+        if (!Object.prototype.hasOwnProperty.call(InstrumentationMap, name_1)) {
+            (0, _api.diag).error('Provided instrumentation name "' + name_1 + '" not found');
+            continue;
+        }
     }
-    /**
-     * Starts a new Span or returns the default NoopSpan based on the sampling
-     * decision.
-     */ Tracer.prototype.startSpan = function(name, options, context) {
-        var _a, _b, _c;
-        if (options === void 0) options = {};
-        if (context === void 0) context = _api.context.active();
-        // remove span from context in case a root span is requested via options
-        if (options.root) context = _api.trace.deleteSpan(context);
-        var parentSpan = _api.trace.getSpan(context);
-        if ((0, _core.isTracingSuppressed)(context)) {
-            _api.diag.debug("Instrumentation suppressed, returning Noop Span");
-            var nonRecordingSpan = _api.trace.wrapSpanContext(_api.INVALID_SPAN_CONTEXT);
-            return nonRecordingSpan;
+    var instrumentations = [];
+    for(var _c = 0, _d = Object.keys(InstrumentationMap); _c < _d.length; _c++){
+        var name_2 = _d[_c];
+        var Instance = InstrumentationMap[name_2];
+        // Defaults are defined by the instrumentation itself
+        var userConfig = (_a = inputConfigs[name_2]) !== null && _a !== void 0 ? _a : {};
+        if (userConfig.enabled === false) {
+            (0, _api.diag).debug("Disabling instrumentation for " + name_2);
+            continue;
         }
-        var parentSpanContext = parentSpan === null || parentSpan === void 0 ? void 0 : parentSpan.spanContext();
-        var spanId = this._idGenerator.generateSpanId();
-        var traceId;
-        var traceState;
-        var parentSpanId;
-        if (!parentSpanContext || !_api.trace.isSpanContextValid(parentSpanContext)) // New root span.
-        traceId = this._idGenerator.generateTraceId();
-        else {
-            // New child span.
-            traceId = parentSpanContext.traceId;
-            traceState = parentSpanContext.traceState;
-            parentSpanId = parentSpanContext.spanId;
+        try {
+            (0, _api.diag).debug("Loading instrumentation for " + name_2);
+            instrumentations.push(new Instance(userConfig));
+        } catch (e) {
+            (0, _api.diag).error(e);
         }
-        var spanKind = (_a = options.kind) !== null && _a !== void 0 ? _a : _api.SpanKind.INTERNAL;
-        var links = ((_b = options.links) !== null && _b !== void 0 ? _b : []).map(function(link) {
-            return {
-                context: link.context,
-                attributes: (0, _core.sanitizeAttributes)(link.attributes)
-            };
-        });
-        var attributes = (0, _core.sanitizeAttributes)(options.attributes);
-        // make sampling decision
-        var samplingResult = this._sampler.shouldSample(context, traceId, name, spanKind, attributes, links);
-        traceState = (_c = samplingResult.traceState) !== null && _c !== void 0 ? _c : traceState;
-        var traceFlags = samplingResult.decision === _api.SamplingDecision.RECORD_AND_SAMPLED ? _api.TraceFlags.SAMPLED : _api.TraceFlags.NONE;
-        var spanContext = {
-            traceId: traceId,
-            spanId: spanId,
-            traceFlags: traceFlags,
-            traceState: traceState
-        };
-        if (samplingResult.decision === _api.SamplingDecision.NOT_RECORD) {
-            _api.diag.debug("Recording is off, propagating context in a non-recording span");
-            var nonRecordingSpan = _api.trace.wrapSpanContext(spanContext);
-            return nonRecordingSpan;
-        }
-        // Set initial span attributes. The attributes object may have been mutated
-        // by the sampler, so we sanitize the merged attributes before setting them.
-        var initAttributes = (0, _core.sanitizeAttributes)(Object.assign(attributes, samplingResult.attributes));
-        var span = new (0, _span.Span)(this, context, name, spanContext, spanKind, parentSpanId, links, options.startTime, undefined, initAttributes);
-        return span;
-    };
-    Tracer.prototype.startActiveSpan = function(name, arg2, arg3, arg4) {
-        var opts;
-        var ctx;
-        var fn;
-        if (arguments.length < 2) return;
-        else if (arguments.length === 2) fn = arg2;
-        else if (arguments.length === 3) {
-            opts = arg2;
-            fn = arg3;
-        } else {
-            opts = arg2;
-            ctx = arg3;
-            fn = arg4;
-        }
-        var parentContext = ctx !== null && ctx !== void 0 ? ctx : _api.context.active();
-        var span = this.startSpan(name, opts, parentContext);
-        var contextWithSpanSet = _api.trace.setSpan(parentContext, span);
-        return _api.context.with(contextWithSpanSet, fn, undefined, span);
-    };
-    /** Returns the active {@link GeneralLimits}. */ Tracer.prototype.getGeneralLimits = function() {
-        return this._generalLimits;
-    };
-    /** Returns the active {@link SpanLimits}. */ Tracer.prototype.getSpanLimits = function() {
-        return this._spanLimits;
-    };
-    Tracer.prototype.getActiveSpanProcessor = function() {
-        return this._tracerProvider.getActiveSpanProcessor();
-    };
-    return Tracer;
-}();
+    }
+    return instrumentations;
+}
 
-},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","./Span":"3tWGt","./utility":"99Faf","./platform":"alGsY","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"6AC4z":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@opentelemetry/instrumentation-document-load":"exbkI","@opentelemetry/instrumentation-fetch":"iWezV","@opentelemetry/instrumentation-user-interaction":"lOen7","@opentelemetry/instrumentation-xml-http-request":"jYPe9","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"6AC4z":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -537,7 +776,7 @@ exports.default = {
     trace: (0, _traceApi.trace)
 };
 
-},{"./baggage/utils":"1FtTJ","./context/context":"8Hj8X","./diag/consoleLogger":"cqEiU","./diag/types":"f917i","./metrics/NoopMeter":"fl46x","./metrics/Metric":"hbEfG","./propagation/TextMapPropagator":"fbpGl","./trace/ProxyTracer":"4RJSP","./trace/ProxyTracerProvider":"5OsDv","./trace/SamplingResult":"9hHpb","./trace/span_kind":"8JdQL","./trace/status":"caBJ1","./trace/trace_flags":"58Fpe","./trace/internal/utils":"43yZb","./trace/spancontext-utils":"g40FB","./trace/invalid-span-constants":"9v7Cm","./context-api":"5ZkHn","./diag-api":"3Hdm6","./metrics-api":"dKL2F","./propagation-api":"Nd6jQ","./trace-api":"hMrLV","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"1FtTJ":[function(require,module,exports) {
+},{"./baggage/utils":"1FtTJ","./context/context":"8Hj8X","./diag/consoleLogger":"cqEiU","./diag/types":"f917i","./metrics/NoopMeter":"fl46x","./metrics/Metric":"hbEfG","./propagation/TextMapPropagator":"fbpGl","./trace/ProxyTracer":"4RJSP","./trace/ProxyTracerProvider":"5OsDv","./trace/SamplingResult":"9hHpb","./trace/span_kind":"8JdQL","./trace/status":"caBJ1","./trace/trace_flags":"58Fpe","./trace/internal/utils":"43yZb","./trace/spancontext-utils":"g40FB","./trace/invalid-span-constants":"9v7Cm","./context-api":"5ZkHn","./diag-api":"3Hdm6","./metrics-api":"dKL2F","./propagation-api":"Nd6jQ","./trace-api":"hMrLV","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"1FtTJ":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -586,7 +825,7 @@ function baggageEntryMetadataFromString(str) {
     };
 }
 
-},{"../api/diag":"gZAmK","./internal/baggage-impl":"1JRmx","./internal/symbol":"bwKBN","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"gZAmK":[function(require,module,exports) {
+},{"../api/diag":"gZAmK","./internal/baggage-impl":"1JRmx","./internal/symbol":"bwKBN","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"gZAmK":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -704,7 +943,7 @@ var API_NAME = "diag";
     return DiagAPI;
 }();
 
-},{"../diag/ComponentLogger":"3nsjJ","../diag/internal/logLevelLogger":"d3Qu4","../diag/types":"f917i","../internal/global-utils":"h4XAN","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"3nsjJ":[function(require,module,exports) {
+},{"../diag/ComponentLogger":"3nsjJ","../diag/internal/logLevelLogger":"d3Qu4","../diag/types":"f917i","../internal/global-utils":"h4XAN","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"3nsjJ":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -798,7 +1037,7 @@ function logProxy(funcName, namespace, args) {
     return logger[funcName].apply(logger, __spreadArray([], __read(args), false));
 }
 
-},{"../internal/global-utils":"h4XAN","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"h4XAN":[function(require,module,exports) {
+},{"../internal/global-utils":"h4XAN","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"h4XAN":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -858,7 +1097,7 @@ function unregisterGlobal(type, diag) {
     if (api) delete api[type];
 }
 
-},{"../platform":"dO2ZQ","../version":"k412A","./semver":"9IXna","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"dO2ZQ":[function(require,module,exports) {
+},{"../platform":"dO2ZQ","../version":"k412A","./semver":"9IXna","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"dO2ZQ":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -878,7 +1117,7 @@ parcelHelpers.defineInteropFlag(exports);
 var _globalThis = require("./globalThis");
 parcelHelpers.exportAll(_globalThis, exports);
 
-},{"./globalThis":"dRquK","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"dRquK":[function(require,module,exports) {
+},{"./globalThis":"dRquK","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"dRquK":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -907,7 +1146,7 @@ parcelHelpers.export(exports, "_globalThis", ()=>_globalThis);
 var global = arguments[3];
 var _globalThis = typeof globalThis === "object" ? globalThis : typeof self === "object" ? self : typeof window === "object" ? window : typeof global === "object" ? global : {};
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"hzbf6":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"9hRtR":[function(require,module,exports) {
 exports.interopDefault = function(a) {
     return a && a.__esModule ? a : {
         default: a
@@ -958,7 +1197,7 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "VERSION", ()=>VERSION);
 var VERSION = "1.8.0";
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"9IXna":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"9IXna":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -1049,7 +1288,7 @@ function _makeCompatibilityCheck(ownVersion) {
 }
 var isCompatible = _makeCompatibilityCheck((0, _version.VERSION));
 
-},{"../version":"k412A","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"d3Qu4":[function(require,module,exports) {
+},{"../version":"k412A","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"d3Qu4":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -1087,7 +1326,7 @@ function createLogLevelDiagLogger(maxLevel, logger) {
     };
 }
 
-},{"../types":"f917i","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"f917i":[function(require,module,exports) {
+},{"../types":"f917i","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"f917i":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -1123,7 +1362,7 @@ var DiagLogLevel;
     /** Used to set the logging level to include all logging */ DiagLogLevel[DiagLogLevel["ALL"] = 9999] = "ALL";
 })(DiagLogLevel || (DiagLogLevel = {}));
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"1JRmx":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"1JRmx":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -1231,7 +1470,7 @@ var BaggageImpl = /** @class */ function() {
     return BaggageImpl;
 }();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"bwKBN":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"bwKBN":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -1253,7 +1492,7 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "baggageEntryMetadataSymbol", ()=>baggageEntryMetadataSymbol);
 var baggageEntryMetadataSymbol = Symbol("BaggageEntryMetadata");
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"8Hj8X":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"8Hj8X":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -1308,7 +1547,7 @@ var BaseContext = /** @class */ function() {
 }();
 var ROOT_CONTEXT = new BaseContext();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"cqEiU":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"cqEiU":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -1375,7 +1614,7 @@ var consoleMap = [
     return DiagConsoleLogger;
 }();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"fl46x":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"fl46x":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -1540,7 +1779,7 @@ function createNoopMeter() {
     return NOOP_METER;
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"hbEfG":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"hbEfG":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -1564,7 +1803,7 @@ var ValueType;
     ValueType[ValueType["DOUBLE"] = 1] = "DOUBLE";
 })(ValueType || (ValueType = {}));
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"fbpGl":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"fbpGl":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -1600,7 +1839,7 @@ var defaultTextMapSetter = {
     }
 };
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"4RJSP":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"4RJSP":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -1649,7 +1888,7 @@ var NOOP_TRACER = new (0, _noopTracer.NoopTracer)();
     return ProxyTracer;
 }();
 
-},{"./NoopTracer":"ciEOJ","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"ciEOJ":[function(require,module,exports) {
+},{"./NoopTracer":"ciEOJ","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"ciEOJ":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -1710,7 +1949,7 @@ function isSpanContext(spanContext) {
     return typeof spanContext === "object" && typeof spanContext["spanId"] === "string" && typeof spanContext["traceId"] === "string" && typeof spanContext["traceFlags"] === "number";
 }
 
-},{"../api/context":"1ZQ7h","../trace/context-utils":"c8keb","./NonRecordingSpan":"80R4i","./spancontext-utils":"g40FB","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"1ZQ7h":[function(require,module,exports) {
+},{"../api/context":"1ZQ7h","../trace/context-utils":"c8keb","./NonRecordingSpan":"80R4i","./spancontext-utils":"g40FB","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"1ZQ7h":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -1816,7 +2055,7 @@ var NOOP_CONTEXT_MANAGER = new (0, _noopContextManager.NoopContextManager)();
     return ContextAPI;
 }();
 
-},{"../context/NoopContextManager":"gHU7f","../internal/global-utils":"h4XAN","./diag":"gZAmK","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"gHU7f":[function(require,module,exports) {
+},{"../context/NoopContextManager":"gHU7f","../internal/global-utils":"h4XAN","./diag":"gZAmK","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"gHU7f":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -1887,7 +2126,7 @@ var NoopContextManager = /** @class */ function() {
     return NoopContextManager;
 }();
 
-},{"./context":"8Hj8X","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"c8keb":[function(require,module,exports) {
+},{"./context":"8Hj8X","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"c8keb":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -1961,7 +2200,7 @@ function getSpanContext(context) {
     return (_a = getSpan(context)) === null || _a === void 0 ? void 0 : _a.spanContext();
 }
 
-},{"../context/context":"8Hj8X","./NonRecordingSpan":"80R4i","../api/context":"1ZQ7h","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"80R4i":[function(require,module,exports) {
+},{"../context/context":"8Hj8X","./NonRecordingSpan":"80R4i","../api/context":"1ZQ7h","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"80R4i":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2024,7 +2263,7 @@ var _invalidSpanConstants = require("./invalid-span-constants");
     return NonRecordingSpan;
 }();
 
-},{"./invalid-span-constants":"9v7Cm","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"9v7Cm":[function(require,module,exports) {
+},{"./invalid-span-constants":"9v7Cm","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"9v7Cm":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2053,7 +2292,7 @@ var INVALID_SPAN_CONTEXT = {
     traceFlags: (0, _traceFlags.TraceFlags).NONE
 };
 
-},{"./trace_flags":"58Fpe","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"58Fpe":[function(require,module,exports) {
+},{"./trace_flags":"58Fpe","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"58Fpe":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2077,7 +2316,7 @@ var TraceFlags;
     /** Bit to represent whether trace is sampled in trace flags. */ TraceFlags[TraceFlags["SAMPLED"] = 1] = "SAMPLED";
 })(TraceFlags || (TraceFlags = {}));
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"g40FB":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"g40FB":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2123,7 +2362,7 @@ function wrapSpanContext(spanContext) {
     return new (0, _nonRecordingSpan.NonRecordingSpan)(spanContext);
 }
 
-},{"./invalid-span-constants":"9v7Cm","./NonRecordingSpan":"80R4i","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"5OsDv":[function(require,module,exports) {
+},{"./invalid-span-constants":"9v7Cm","./NonRecordingSpan":"80R4i","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"5OsDv":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2175,7 +2414,7 @@ var NOOP_TRACER_PROVIDER = new (0, _noopTracerProvider.NoopTracerProvider)();
     return ProxyTracerProvider;
 }();
 
-},{"./ProxyTracer":"4RJSP","./NoopTracerProvider":"j8CJP","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"j8CJP":[function(require,module,exports) {
+},{"./ProxyTracer":"4RJSP","./NoopTracerProvider":"j8CJP","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"j8CJP":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2207,7 +2446,7 @@ var _noopTracer = require("./NoopTracer");
     return NoopTracerProvider;
 }();
 
-},{"./NoopTracer":"ciEOJ","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"9hHpb":[function(require,module,exports) {
+},{"./NoopTracer":"ciEOJ","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"9hHpb":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2245,7 +2484,7 @@ var SamplingDecision;
      */ SamplingDecision[SamplingDecision["RECORD_AND_SAMPLED"] = 2] = "RECORD_AND_SAMPLED";
 })(SamplingDecision || (SamplingDecision = {}));
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"8JdQL":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"8JdQL":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2286,7 +2525,7 @@ var SpanKind;
      */ SpanKind[SpanKind["CONSUMER"] = 4] = "CONSUMER";
 })(SpanKind || (SpanKind = {}));
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"caBJ1":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"caBJ1":[function(require,module,exports) {
 /**
  * An enumeration of status codes.
  */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -2306,7 +2545,7 @@ var SpanStatusCode;
      */ SpanStatusCode[SpanStatusCode["ERROR"] = 2] = "ERROR";
 })(SpanStatusCode || (SpanStatusCode = {}));
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"43yZb":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"43yZb":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2329,7 +2568,7 @@ function createTraceState(rawTraceState) {
     return new (0, _tracestateImpl.TraceStateImpl)(rawTraceState);
 }
 
-},{"./tracestate-impl":"c2Tax","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"c2Tax":[function(require,module,exports) {
+},{"./tracestate-impl":"c2Tax","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"c2Tax":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2416,7 +2655,7 @@ var LIST_MEMBER_KEY_VALUE_SPLITTER = "=";
     return TraceStateImpl;
 }();
 
-},{"./tracestate-validators":"2Nd45","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"2Nd45":[function(require,module,exports) {
+},{"./tracestate-validators":"2Nd45","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"2Nd45":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2458,7 +2697,7 @@ function validateValue(value) {
     return VALID_VALUE_BASE_REGEX.test(value) && !INVALID_VALUE_COMMA_EQUAL_REGEX.test(value);
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"5ZkHn":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"5ZkHn":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2481,7 +2720,7 @@ parcelHelpers.export(exports, "context", ()=>context);
 var _context = require("./api/context");
 var context = (0, _context.ContextAPI).getInstance();
 
-},{"./api/context":"1ZQ7h","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"3Hdm6":[function(require,module,exports) {
+},{"./api/context":"1ZQ7h","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"3Hdm6":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2504,7 +2743,7 @@ parcelHelpers.export(exports, "diag", ()=>diag);
 var _diag = require("./api/diag");
 var diag = (0, _diag.DiagAPI).instance();
 
-},{"./api/diag":"gZAmK","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"dKL2F":[function(require,module,exports) {
+},{"./api/diag":"gZAmK","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"dKL2F":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2527,7 +2766,7 @@ parcelHelpers.export(exports, "metrics", ()=>metrics);
 var _metrics = require("./api/metrics");
 var metrics = (0, _metrics.MetricsAPI).getInstance();
 
-},{"./api/metrics":"hjL4Z","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"hjL4Z":[function(require,module,exports) {
+},{"./api/metrics":"hjL4Z","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"hjL4Z":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2579,7 +2818,7 @@ var API_NAME = "metrics";
     return MetricsAPI;
 }();
 
-},{"../metrics/NoopMeterProvider":"jPYvF","../internal/global-utils":"h4XAN","./diag":"gZAmK","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"jPYvF":[function(require,module,exports) {
+},{"../metrics/NoopMeterProvider":"jPYvF","../internal/global-utils":"h4XAN","./diag":"gZAmK","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"jPYvF":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2611,7 +2850,7 @@ var _noopMeter = require("./NoopMeter");
 }();
 var NOOP_METER_PROVIDER = new NoopMeterProvider();
 
-},{"./NoopMeter":"fl46x","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"Nd6jQ":[function(require,module,exports) {
+},{"./NoopMeter":"fl46x","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"Nd6jQ":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2634,7 +2873,7 @@ parcelHelpers.export(exports, "propagation", ()=>propagation);
 var _propagation = require("./api/propagation");
 var propagation = (0, _propagation.PropagationAPI).getInstance();
 
-},{"./api/propagation":"9PDZ8","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"9PDZ8":[function(require,module,exports) {
+},{"./api/propagation":"9PDZ8","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"9PDZ8":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2715,7 +2954,7 @@ var NOOP_TEXT_MAP_PROPAGATOR = new (0, _noopTextMapPropagator.NoopTextMapPropaga
     return PropagationAPI;
 }();
 
-},{"../internal/global-utils":"h4XAN","../propagation/NoopTextMapPropagator":"5aVXl","../propagation/TextMapPropagator":"fbpGl","../baggage/context-helpers":"lnCoA","../baggage/utils":"1FtTJ","./diag":"gZAmK","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"5aVXl":[function(require,module,exports) {
+},{"../internal/global-utils":"h4XAN","../propagation/NoopTextMapPropagator":"5aVXl","../propagation/TextMapPropagator":"fbpGl","../baggage/context-helpers":"lnCoA","../baggage/utils":"1FtTJ","./diag":"gZAmK","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"5aVXl":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2747,7 +2986,7 @@ var NoopTextMapPropagator = /** @class */ function() {
     return NoopTextMapPropagator;
 }();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"lnCoA":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"lnCoA":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2804,7 +3043,7 @@ function deleteBaggage(context) {
     return context.deleteValue(BAGGAGE_KEY);
 }
 
-},{"../api/context":"1ZQ7h","../context/context":"8Hj8X","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"hMrLV":[function(require,module,exports) {
+},{"../api/context":"1ZQ7h","../context/context":"8Hj8X","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"hMrLV":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2827,7 +3066,7 @@ parcelHelpers.export(exports, "trace", ()=>trace);
 var _trace = require("./api/trace");
 var trace = (0, _trace.TraceAPI).getInstance();
 
-},{"./api/trace":"9U6uF","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"9U6uF":[function(require,module,exports) {
+},{"./api/trace":"9U6uF","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"9U6uF":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2895,7 +3134,250 @@ var API_NAME = "trace";
     return TraceAPI;
 }();
 
-},{"../internal/global-utils":"h4XAN","../trace/ProxyTracerProvider":"5OsDv","../trace/spancontext-utils":"g40FB","../trace/context-utils":"c8keb","./diag":"gZAmK","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"dBsXh":[function(require,module,exports) {
+},{"../internal/global-utils":"h4XAN","../trace/ProxyTracerProvider":"5OsDv","../trace/spancontext-utils":"g40FB","../trace/context-utils":"c8keb","./diag":"gZAmK","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"exbkI":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _instrumentation = require("./instrumentation");
+parcelHelpers.exportAll(_instrumentation, exports);
+var _attributeNames = require("./enums/AttributeNames");
+parcelHelpers.exportAll(_attributeNames, exports);
+var _types = require("./types");
+parcelHelpers.exportAll(_types, exports);
+
+},{"./instrumentation":"b9rsS","./enums/AttributeNames":"2uTf8","./types":"5cOeU","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"b9rsS":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "DocumentLoadInstrumentation", ()=>DocumentLoadInstrumentation);
+var _api = require("@opentelemetry/api");
+var _core = require("@opentelemetry/core");
+var _sdkTraceWeb = require("@opentelemetry/sdk-trace-web");
+var _instrumentation = require("@opentelemetry/instrumentation");
+var _attributeNames = require("./enums/AttributeNames");
+var _version = require("./version");
+var _semanticConventions = require("@opentelemetry/semantic-conventions");
+var _utils = require("./utils");
+var __extends = undefined && undefined.__extends || function() {
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || ({
+            __proto__: []
+        }) instanceof Array && function(d, b) {
+            d.__proto__ = b;
+        } || function(d, b) {
+            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+        };
+        return extendStatics(d, b);
+    };
+    return function(d, b) {
+        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() {
+            this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+}();
+/**
+ * This class represents a document load plugin
+ */ var DocumentLoadInstrumentation = /** @class */ function(_super) {
+    __extends(DocumentLoadInstrumentation, _super);
+    /**
+     *
+     * @param config
+     */ function DocumentLoadInstrumentation(config) {
+        if (config === void 0) config = {};
+        var _this = _super.call(this, "@opentelemetry/instrumentation-document-load", (0, _version.VERSION), config) || this;
+        _this.component = "document-load";
+        _this.version = "1";
+        _this.moduleName = _this.component;
+        return _this;
+    }
+    DocumentLoadInstrumentation.prototype.init = function() {};
+    /**
+     * callback to be executed when page is loaded
+     */ DocumentLoadInstrumentation.prototype._onDocumentLoaded = function() {
+        var _this = this;
+        // Timeout is needed as load event doesn't have yet the performance metrics for loadEnd.
+        // Support for event "loadend" is very limited and cannot be used
+        window.setTimeout(function() {
+            _this._collectPerformance();
+        });
+    };
+    /**
+     * Adds spans for all resources
+     * @param rootSpan
+     */ DocumentLoadInstrumentation.prototype._addResourcesSpans = function(rootSpan) {
+        var _this = this;
+        var _a, _b;
+        var resources = (_b = (_a = (0, _core.otperformance)).getEntriesByType) === null || _b === void 0 ? void 0 : _b.call(_a, "resource");
+        if (resources) resources.forEach(function(resource) {
+            _this._initResourceSpan(resource, rootSpan);
+        });
+    };
+    /**
+     * Collects information about performance and creates appropriate spans
+     */ DocumentLoadInstrumentation.prototype._collectPerformance = function() {
+        var _this = this;
+        var metaElement = Array.from(document.getElementsByTagName("meta")).find(function(e) {
+            return e.getAttribute("name") === (0, _core.TRACE_PARENT_HEADER);
+        });
+        var entries = (0, _utils.getPerformanceNavigationEntries)();
+        var traceparent = metaElement && metaElement.content || "";
+        (0, _api.context).with((0, _api.propagation).extract((0, _api.ROOT_CONTEXT), {
+            traceparent: traceparent
+        }), function() {
+            var _a;
+            var rootSpan = _this._startSpan((0, _attributeNames.AttributeNames).DOCUMENT_LOAD, (0, _sdkTraceWeb.PerformanceTimingNames).FETCH_START, entries);
+            if (!rootSpan) return;
+            (0, _api.context).with((0, _api.trace).setSpan((0, _api.context).active(), rootSpan), function() {
+                var fetchSpan = _this._startSpan((0, _attributeNames.AttributeNames).DOCUMENT_FETCH, (0, _sdkTraceWeb.PerformanceTimingNames).FETCH_START, entries);
+                if (fetchSpan) {
+                    fetchSpan.setAttribute((0, _semanticConventions.SEMATTRS_HTTP_URL), location.href);
+                    (0, _api.context).with((0, _api.trace).setSpan((0, _api.context).active(), fetchSpan), function() {
+                        var _a;
+                        (0, _sdkTraceWeb.addSpanNetworkEvents)(fetchSpan, entries);
+                        _this._addCustomAttributesOnSpan(fetchSpan, (_a = _this._getConfig().applyCustomAttributesOnSpan) === null || _a === void 0 ? void 0 : _a.documentFetch);
+                        _this._endSpan(fetchSpan, (0, _sdkTraceWeb.PerformanceTimingNames).RESPONSE_END, entries);
+                    });
+                }
+            });
+            rootSpan.setAttribute((0, _semanticConventions.SEMATTRS_HTTP_URL), location.href);
+            rootSpan.setAttribute((0, _semanticConventions.SEMATTRS_HTTP_USER_AGENT), navigator.userAgent);
+            _this._addResourcesSpans(rootSpan);
+            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).FETCH_START, entries);
+            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).UNLOAD_EVENT_START, entries);
+            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).UNLOAD_EVENT_END, entries);
+            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).DOM_INTERACTIVE, entries);
+            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).DOM_CONTENT_LOADED_EVENT_START, entries);
+            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).DOM_CONTENT_LOADED_EVENT_END, entries);
+            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).DOM_COMPLETE, entries);
+            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).LOAD_EVENT_START, entries);
+            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).LOAD_EVENT_END, entries);
+            (0, _utils.addSpanPerformancePaintEvents)(rootSpan);
+            _this._addCustomAttributesOnSpan(rootSpan, (_a = _this._getConfig().applyCustomAttributesOnSpan) === null || _a === void 0 ? void 0 : _a.documentLoad);
+            _this._endSpan(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).LOAD_EVENT_END, entries);
+        });
+    };
+    /**
+     * Helper function for ending span
+     * @param span
+     * @param performanceName name of performance entry for time end
+     * @param entries
+     */ DocumentLoadInstrumentation.prototype._endSpan = function(span, performanceName, entries) {
+        // span can be undefined when entries are missing the certain performance - the span will not be created
+        if (span) {
+            if ((0, _sdkTraceWeb.hasKey)(entries, performanceName)) span.end(entries[performanceName]);
+            else // just end span
+            span.end();
+        }
+    };
+    /**
+     * Creates and ends a span with network information about resource added as timed events
+     * @param resource
+     * @param parentSpan
+     */ DocumentLoadInstrumentation.prototype._initResourceSpan = function(resource, parentSpan) {
+        var _a;
+        var span = this._startSpan((0, _attributeNames.AttributeNames).RESOURCE_FETCH, (0, _sdkTraceWeb.PerformanceTimingNames).FETCH_START, resource, parentSpan);
+        if (span) {
+            span.setAttribute((0, _semanticConventions.SEMATTRS_HTTP_URL), resource.name);
+            (0, _sdkTraceWeb.addSpanNetworkEvents)(span, resource);
+            this._addCustomAttributesOnResourceSpan(span, resource, (_a = this._getConfig().applyCustomAttributesOnSpan) === null || _a === void 0 ? void 0 : _a.resourceFetch);
+            this._endSpan(span, (0, _sdkTraceWeb.PerformanceTimingNames).RESPONSE_END, resource);
+        }
+    };
+    /**
+     * Helper function for starting a span
+     * @param spanName name of span
+     * @param performanceName name of performance entry for time start
+     * @param entries
+     * @param parentSpan
+     */ DocumentLoadInstrumentation.prototype._startSpan = function(spanName, performanceName, entries, parentSpan) {
+        if ((0, _sdkTraceWeb.hasKey)(entries, performanceName) && typeof entries[performanceName] === "number") {
+            var span = this.tracer.startSpan(spanName, {
+                startTime: entries[performanceName]
+            }, parentSpan ? (0, _api.trace).setSpan((0, _api.context).active(), parentSpan) : undefined);
+            return span;
+        }
+        return undefined;
+    };
+    /**
+     * executes callback {_onDocumentLoaded} when the page is loaded
+     */ DocumentLoadInstrumentation.prototype._waitForPageLoad = function() {
+        if (window.document.readyState === "complete") this._onDocumentLoaded();
+        else {
+            this._onDocumentLoaded = this._onDocumentLoaded.bind(this);
+            window.addEventListener("load", this._onDocumentLoaded);
+        }
+    };
+    DocumentLoadInstrumentation.prototype._getConfig = function() {
+        return this._config;
+    };
+    /**
+     * adds custom attributes to root span if configured
+     */ DocumentLoadInstrumentation.prototype._addCustomAttributesOnSpan = function(span, applyCustomAttributesOnSpan) {
+        var _this = this;
+        if (applyCustomAttributesOnSpan) (0, _instrumentation.safeExecuteInTheMiddle)(function() {
+            return applyCustomAttributesOnSpan(span);
+        }, function(error) {
+            if (!error) return;
+            _this._diag.error("addCustomAttributesOnSpan", error);
+        }, true);
+    };
+    /**
+     * adds custom attributes to span if configured
+     */ DocumentLoadInstrumentation.prototype._addCustomAttributesOnResourceSpan = function(span, resource, applyCustomAttributesOnSpan) {
+        var _this = this;
+        if (applyCustomAttributesOnSpan) (0, _instrumentation.safeExecuteInTheMiddle)(function() {
+            return applyCustomAttributesOnSpan(span, resource);
+        }, function(error) {
+            if (!error) return;
+            _this._diag.error("addCustomAttributesOnResourceSpan", error);
+        }, true);
+    };
+    /**
+     * implements enable function
+     */ DocumentLoadInstrumentation.prototype.enable = function() {
+        // remove previously attached load to avoid adding the same event twice
+        // in case of multiple enable calling.
+        window.removeEventListener("load", this._onDocumentLoaded);
+        this._waitForPageLoad();
+    };
+    /**
+     * implements disable function
+     */ DocumentLoadInstrumentation.prototype.disable = function() {
+        window.removeEventListener("load", this._onDocumentLoaded);
+    };
+    return DocumentLoadInstrumentation;
+}((0, _instrumentation.InstrumentationBase));
+
+},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","@opentelemetry/sdk-trace-web":"eXZZL","@opentelemetry/instrumentation":"3OTpd","./enums/AttributeNames":"2uTf8","./version":"kjKSa","@opentelemetry/semantic-conventions":"lCgfj","./utils":"hRpx5","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"dBsXh":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -2976,7 +3458,7 @@ var internal = {
     _export: (0, _exporter._export)
 };
 
-},{"./baggage/propagation/W3CBaggagePropagator":"3dmoE","./common/anchored-clock":"6bEaW","./common/attributes":"bYq4q","./common/global-error-handler":"hKz5C","./common/logging-error-handler":"8D49l","./common/time":"oOZeC","./common/types":"dYgp0","./common/hex-to-binary":"5iTrj","./ExportResult":"2fJSh","./baggage/utils":"kLEpF","./platform":"a3NCV","./propagation/composite":"8mhmB","./trace/W3CTraceContextPropagator":"j30mQ","./trace/IdGenerator":"fzitc","./trace/rpc-metadata":"eyPsO","./trace/sampler/AlwaysOffSampler":"9KkRt","./trace/sampler/AlwaysOnSampler":"jalnp","./trace/sampler/ParentBasedSampler":"gERye","./trace/sampler/TraceIdRatioBasedSampler":"69Ird","./trace/suppress-tracing":"51l3B","./trace/TraceState":"9sU1J","./utils/environment":"k6o1y","./utils/merge":"6klbq","./utils/sampling":"fxM1u","./utils/timeout":"B1o2t","./utils/url":"lafWE","./utils/wrap":"kPm4I","./utils/callback":"Wira8","./version":"2JrQh","./internal/exporter":"4s27R","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"3dmoE":[function(require,module,exports) {
+},{"./baggage/propagation/W3CBaggagePropagator":"3dmoE","./common/anchored-clock":"6bEaW","./common/attributes":"bYq4q","./common/global-error-handler":"hKz5C","./common/logging-error-handler":"8D49l","./common/time":"oOZeC","./common/types":"dYgp0","./common/hex-to-binary":"5iTrj","./ExportResult":"2fJSh","./baggage/utils":"kLEpF","./platform":"a3NCV","./propagation/composite":"8mhmB","./trace/W3CTraceContextPropagator":"j30mQ","./trace/IdGenerator":"fzitc","./trace/rpc-metadata":"eyPsO","./trace/sampler/AlwaysOffSampler":"9KkRt","./trace/sampler/AlwaysOnSampler":"jalnp","./trace/sampler/ParentBasedSampler":"gERye","./trace/sampler/TraceIdRatioBasedSampler":"69Ird","./trace/suppress-tracing":"51l3B","./trace/TraceState":"9sU1J","./utils/environment":"k6o1y","./utils/merge":"6klbq","./utils/sampling":"fxM1u","./utils/timeout":"B1o2t","./utils/url":"lafWE","./utils/wrap":"kPm4I","./utils/callback":"Wira8","./version":"2JrQh","./internal/exporter":"4s27R","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"3dmoE":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -3042,7 +3524,7 @@ var _utils = require("../utils");
     return W3CBaggagePropagator;
 }();
 
-},{"@opentelemetry/api":"6AC4z","../../trace/suppress-tracing":"51l3B","../constants":"bxSBV","../utils":"kLEpF","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"51l3B":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","../../trace/suppress-tracing":"51l3B","../constants":"bxSBV","../utils":"kLEpF","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"51l3B":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -3074,7 +3556,7 @@ function isTracingSuppressed(context) {
     return context.getValue(SUPPRESS_TRACING_KEY) === true;
 }
 
-},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"bxSBV":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"bxSBV":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -3106,7 +3588,7 @@ var BAGGAGE_MAX_NAME_VALUE_PAIRS = 180;
 var BAGGAGE_MAX_PER_NAME_VALUE_PAIRS = 4096;
 var BAGGAGE_MAX_TOTAL_LENGTH = 8192;
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"kLEpF":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"kLEpF":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "serializeKeyPairs", ()=>serializeKeyPairs);
@@ -3197,7 +3679,7 @@ function parseKeyPairsIntoRecord(value) {
     }, {});
 }
 
-},{"@opentelemetry/api":"6AC4z","./constants":"bxSBV","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"6bEaW":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","./constants":"bxSBV","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"6bEaW":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -3252,7 +3734,7 @@ var AnchoredClock = /** @class */ function() {
     return AnchoredClock;
 }();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"bYq4q":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"bYq4q":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -3387,7 +3869,7 @@ function isValidPrimitiveAttributeValue(val) {
     return false;
 }
 
-},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"hKz5C":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"hKz5C":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -3423,7 +3905,7 @@ function globalErrorHandler(ex) {
     } catch (_a) {} // eslint-disable-line no-empty
 }
 
-},{"./logging-error-handler":"8D49l","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"8D49l":[function(require,module,exports) {
+},{"./logging-error-handler":"8D49l","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"8D49l":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -3475,7 +3957,7 @@ function loggingErrorHandler() {
     return result;
 }
 
-},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"oOZeC":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"oOZeC":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -3627,7 +4109,7 @@ function addHrTimes(time1, time2) {
     return out;
 }
 
-},{"../platform":"a3NCV","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"a3NCV":[function(require,module,exports) {
+},{"../platform":"a3NCV","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"a3NCV":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -3659,7 +4141,7 @@ parcelHelpers.exportAll(_sdkInfo, exports);
 var _timerUtil = require("./timer-util");
 parcelHelpers.exportAll(_timerUtil, exports);
 
-},{"./environment":"a8j04","./globalThis":"cav7A","./hex-to-base64":"aSaRw","./RandomIdGenerator":"2zz95","./performance":"3XRRP","./sdk-info":"3i6TP","./timer-util":"gOhxt","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"a8j04":[function(require,module,exports) {
+},{"./environment":"a8j04","./globalThis":"cav7A","./hex-to-base64":"aSaRw","./RandomIdGenerator":"2zz95","./performance":"3XRRP","./sdk-info":"3i6TP","./timer-util":"gOhxt","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"a8j04":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -3686,7 +4168,7 @@ function getEnv() {
     return Object.assign({}, (0, _environment.DEFAULT_ENVIRONMENT), globalEnv);
 }
 
-},{"../../utils/environment":"k6o1y","./globalThis":"cav7A","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"k6o1y":[function(require,module,exports) {
+},{"../../utils/environment":"k6o1y","./globalThis":"cav7A","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"k6o1y":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -3938,7 +4420,7 @@ function getEnvWithoutDefaults() {
     return typeof process !== "undefined" && process && process.env ? parseEnvironment(process.env) : parseEnvironment((0, _globalThis._globalThis));
 }
 
-},{"384eab4acedf531b":"d5jf4","@opentelemetry/api":"6AC4z","./sampling":"fxM1u","../platform/browser/globalThis":"cav7A","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"d5jf4":[function(require,module,exports) {
+},{"384eab4acedf531b":"d5jf4","@opentelemetry/api":"6AC4z","./sampling":"fxM1u","../platform/browser/globalThis":"cav7A","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"d5jf4":[function(require,module,exports) {
 // shim for using process in browser
 var process = module.exports = {};
 // cached from whatever global is present so that test runners that stub it
@@ -4111,7 +4593,7 @@ var TracesSamplerValues;
     TracesSamplerValues["TraceIdRatio"] = "traceidratio";
 })(TracesSamplerValues || (TracesSamplerValues = {}));
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"cav7A":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"cav7A":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -4140,7 +4622,7 @@ parcelHelpers.export(exports, "_globalThis", ()=>_globalThis);
 var global = arguments[3];
 var _globalThis = typeof globalThis === "object" ? globalThis : typeof self === "object" ? self : typeof window === "object" ? window : typeof global === "object" ? global : {};
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"aSaRw":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"aSaRw":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -4191,7 +4673,7 @@ function hexToBase64(hexStr) {
     return btoa(String.fromCharCode.apply(String, __spreadArray([], __read((0, _hexToBinary.hexToBinary)(hexStr)), false)));
 }
 
-},{"../../common/hex-to-binary":"5iTrj","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"5iTrj":[function(require,module,exports) {
+},{"../../common/hex-to-binary":"5iTrj","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"5iTrj":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -4228,7 +4710,7 @@ function hexToBinary(hexStr) {
     return buf;
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"2zz95":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"2zz95":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "RandomIdGenerator", ()=>RandomIdGenerator);
@@ -4261,7 +4743,7 @@ function getIdGenerator(bytes) {
     };
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"3XRRP":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"3XRRP":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -4281,7 +4763,7 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "otperformance", ()=>otperformance);
 var otperformance = performance;
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"3i6TP":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"3i6TP":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -4304,7 +4786,7 @@ var _semanticConventions = require("@opentelemetry/semantic-conventions");
 var _a;
 var SDK_INFO = (_a = {}, _a[(0, _semanticConventions.SemanticResourceAttributes).TELEMETRY_SDK_NAME] = "opentelemetry", _a[(0, _semanticConventions.SemanticResourceAttributes).PROCESS_RUNTIME_NAME] = "browser", _a[(0, _semanticConventions.SemanticResourceAttributes).TELEMETRY_SDK_LANGUAGE] = (0, _semanticConventions.TelemetrySdkLanguageValues).WEBJS, _a[(0, _semanticConventions.SemanticResourceAttributes).TELEMETRY_SDK_VERSION] = (0, _version.VERSION), _a);
 
-},{"../../version":"2JrQh","@opentelemetry/semantic-conventions":"lCgfj","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"2JrQh":[function(require,module,exports) {
+},{"../../version":"2JrQh","@opentelemetry/semantic-conventions":"lCgfj","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"2JrQh":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -4325,7 +4807,7 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "VERSION", ()=>VERSION);
 var VERSION = "1.23.0";
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"lCgfj":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"lCgfj":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -4347,7 +4829,7 @@ parcelHelpers.exportAll(_trace, exports);
 var _resource = require("./resource");
 parcelHelpers.exportAll(_resource, exports);
 
-},{"./trace":"9Fj5N","./resource":"6gLs0","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"9Fj5N":[function(require,module,exports) {
+},{"./trace":"9Fj5N","./resource":"6gLs0","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"9Fj5N":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -4367,7 +4849,7 @@ parcelHelpers.defineInteropFlag(exports);
 var _semanticAttributes = require("./SemanticAttributes");
 parcelHelpers.exportAll(_semanticAttributes, exports);
 
-},{"./SemanticAttributes":"jqkBD","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"jqkBD":[function(require,module,exports) {
+},{"./SemanticAttributes":"jqkBD","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"jqkBD":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -5554,7 +6036,7 @@ var MessageTypeValues = /*#__PURE__*/ (0, _utils.createConstMap)([
     TMP_MESSAGETYPEVALUES_RECEIVED
 ]);
 
-},{"../internal/utils":"hV8FE","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"hV8FE":[function(require,module,exports) {
+},{"../internal/utils":"hV8FE","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"hV8FE":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -5587,7 +6069,7 @@ function createConstMap(values) {
     return res;
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"6gLs0":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"6gLs0":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -5607,7 +6089,7 @@ parcelHelpers.defineInteropFlag(exports);
 var _semanticResourceAttributes = require("./SemanticResourceAttributes");
 parcelHelpers.exportAll(_semanticResourceAttributes, exports);
 
-},{"./SemanticResourceAttributes":"7C7hx","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"7C7hx":[function(require,module,exports) {
+},{"./SemanticResourceAttributes":"7C7hx","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"7C7hx":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -6221,7 +6703,7 @@ var TelemetrySdkLanguageValues = /*#__PURE__*/ (0, _utils.createConstMap)([
     TMP_TELEMETRYSDKLANGUAGEVALUES_WEBJS
 ]);
 
-},{"../internal/utils":"hV8FE","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"gOhxt":[function(require,module,exports) {
+},{"../internal/utils":"hV8FE","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"gOhxt":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -6241,7 +6723,7 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "unrefTimer", ()=>unrefTimer);
 function unrefTimer(_timer) {}
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"dYgp0":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"dYgp0":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -6259,7 +6741,7 @@ function unrefTimer(_timer) {}
  */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"2fJSh":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"2fJSh":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -6283,7 +6765,7 @@ var ExportResultCode;
     ExportResultCode[ExportResultCode["FAILED"] = 1] = "FAILED";
 })(ExportResultCode || (ExportResultCode = {}));
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"8mhmB":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"8mhmB":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -6388,7 +6870,7 @@ var __values = undefined && undefined.__values || function(o) {
     return CompositePropagator;
 }();
 
-},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"j30mQ":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"j30mQ":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -6482,7 +6964,7 @@ function parseTraceParent(traceParent) {
     return W3CTraceContextPropagator;
 }();
 
-},{"@opentelemetry/api":"6AC4z","./suppress-tracing":"51l3B","./TraceState":"9sU1J","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"9sU1J":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","./suppress-tracing":"51l3B","./TraceState":"9sU1J","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"9sU1J":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -6569,7 +7051,7 @@ var LIST_MEMBER_KEY_VALUE_SPLITTER = "=";
     return TraceState;
 }();
 
-},{"../internal/validators":"kdvPR","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"kdvPR":[function(require,module,exports) {
+},{"../internal/validators":"kdvPR","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"kdvPR":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -6611,7 +7093,7 @@ function validateValue(value) {
     return VALID_VALUE_BASE_REGEX.test(value) && !INVALID_VALUE_COMMA_EQUAL_REGEX.test(value);
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"fzitc":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"fzitc":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -6629,7 +7111,7 @@ function validateValue(value) {
  */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"eyPsO":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"eyPsO":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -6666,7 +7148,7 @@ function getRPCMetadata(context) {
     return context.getValue(RPC_METADATA_KEY);
 }
 
-},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"9KkRt":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"9KkRt":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -6701,7 +7183,7 @@ var _api = require("@opentelemetry/api");
     return AlwaysOffSampler;
 }();
 
-},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"jalnp":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"jalnp":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -6736,7 +7218,7 @@ var _api = require("@opentelemetry/api");
     return AlwaysOnSampler;
 }();
 
-},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"gERye":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"gERye":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -6791,7 +7273,7 @@ var _alwaysOnSampler = require("./AlwaysOnSampler");
     return ParentBasedSampler;
 }();
 
-},{"@opentelemetry/api":"6AC4z","../../common/global-error-handler":"hKz5C","./AlwaysOffSampler":"9KkRt","./AlwaysOnSampler":"jalnp","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"69Ird":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","../../common/global-error-handler":"hKz5C","./AlwaysOffSampler":"9KkRt","./AlwaysOnSampler":"jalnp","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"69Ird":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -6844,7 +7326,7 @@ var _api = require("@opentelemetry/api");
     return TraceIdRatioBasedSampler;
 }();
 
-},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"6klbq":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"6klbq":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -6971,7 +7453,7 @@ function shouldMerge(one, two) {
     return true;
 }
 
-},{"./lodash.merge":"dGhva","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"dGhva":[function(require,module,exports) {
+},{"./lodash.merge":"dGhva","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"dGhva":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -7117,7 +7599,7 @@ function isPlainObject(value) {
     return nativeObjectToString.call(value);
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"B1o2t":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"B1o2t":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -7196,7 +7678,7 @@ function callWithTimeout(promise, timeout) {
     });
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"lafWE":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"lafWE":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 /*
@@ -7259,7 +7741,7 @@ function isUrlIgnored(url, ignoredUrls) {
     return false;
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"kPm4I":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"kPm4I":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -7284,7 +7766,7 @@ function isWrapped(func) {
     return typeof func === "function" && typeof func.__original === "function" && typeof func.__unwrap === "function" && func.__wrapped === true;
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"Wira8":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"Wira8":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -7378,7 +7860,7 @@ var __spreadArray = undefined && undefined.__spreadArray || function(to, from, p
     return BindOnceFuture;
 }();
 
-},{"./promise":"ei2cy","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"ei2cy":[function(require,module,exports) {
+},{"./promise":"ei2cy","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"ei2cy":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -7420,7 +7902,7 @@ var Deferred = /** @class */ function() {
     return Deferred;
 }();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"4s27R":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"4s27R":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -7454,7 +7936,288 @@ function _export(exporter, arg) {
     });
 }
 
-},{"@opentelemetry/api":"6AC4z","../trace/suppress-tracing":"51l3B","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"3tWGt":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","../trace/suppress-tracing":"51l3B","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"eXZZL":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _webTracerProvider = require("./WebTracerProvider");
+parcelHelpers.exportAll(_webTracerProvider, exports);
+var _stackContextManager = require("./StackContextManager");
+parcelHelpers.exportAll(_stackContextManager, exports);
+var _performanceTimingNames = require("./enums/PerformanceTimingNames");
+parcelHelpers.exportAll(_performanceTimingNames, exports);
+var _types = require("./types");
+parcelHelpers.exportAll(_types, exports);
+var _utils = require("./utils");
+parcelHelpers.exportAll(_utils, exports);
+var _sdkTraceBase = require("@opentelemetry/sdk-trace-base");
+parcelHelpers.exportAll(_sdkTraceBase, exports);
+
+},{"./WebTracerProvider":"gYn17","./StackContextManager":"dXLQl","./enums/PerformanceTimingNames":"eNyqo","./types":"5dYQ0","./utils":"ccAWO","@opentelemetry/sdk-trace-base":"jj5uM","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"gYn17":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "WebTracerProvider", ()=>WebTracerProvider);
+var _sdkTraceBase = require("@opentelemetry/sdk-trace-base");
+var _stackContextManager = require("./StackContextManager");
+var __extends = undefined && undefined.__extends || function() {
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || ({
+            __proto__: []
+        }) instanceof Array && function(d, b) {
+            d.__proto__ = b;
+        } || function(d, b) {
+            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+        };
+        return extendStatics(d, b);
+    };
+    return function(d, b) {
+        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() {
+            this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+}();
+/**
+ * This class represents a web tracer with {@link StackContextManager}
+ */ var WebTracerProvider = /** @class */ function(_super) {
+    __extends(WebTracerProvider, _super);
+    /**
+     * Constructs a new Tracer instance.
+     * @param config Web Tracer config
+     */ function WebTracerProvider(config) {
+        if (config === void 0) config = {};
+        var _this = _super.call(this, config) || this;
+        if (config.contextManager) throw "contextManager should be defined in register method not in constructor";
+        if (config.propagator) throw "propagator should be defined in register method not in constructor";
+        return _this;
+    }
+    /**
+     * Register this TracerProvider for use with the OpenTelemetry API.
+     * Undefined values may be replaced with defaults, and
+     * null values will be skipped.
+     *
+     * @param config Configuration object for SDK registration
+     */ WebTracerProvider.prototype.register = function(config) {
+        if (config === void 0) config = {};
+        if (config.contextManager === undefined) config.contextManager = new (0, _stackContextManager.StackContextManager)();
+        if (config.contextManager) config.contextManager.enable();
+        _super.prototype.register.call(this, config);
+    };
+    return WebTracerProvider;
+}((0, _sdkTraceBase.BasicTracerProvider));
+
+},{"@opentelemetry/sdk-trace-base":"jj5uM","./StackContextManager":"dXLQl","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"jj5uM":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _tracer = require("./Tracer");
+parcelHelpers.exportAll(_tracer, exports);
+var _basicTracerProvider = require("./BasicTracerProvider");
+parcelHelpers.exportAll(_basicTracerProvider, exports);
+var _platform = require("./platform");
+parcelHelpers.exportAll(_platform, exports);
+var _consoleSpanExporter = require("./export/ConsoleSpanExporter");
+parcelHelpers.exportAll(_consoleSpanExporter, exports);
+var _inMemorySpanExporter = require("./export/InMemorySpanExporter");
+parcelHelpers.exportAll(_inMemorySpanExporter, exports);
+var _readableSpan = require("./export/ReadableSpan");
+parcelHelpers.exportAll(_readableSpan, exports);
+var _simpleSpanProcessor = require("./export/SimpleSpanProcessor");
+parcelHelpers.exportAll(_simpleSpanProcessor, exports);
+var _spanExporter = require("./export/SpanExporter");
+parcelHelpers.exportAll(_spanExporter, exports);
+var _noopSpanProcessor = require("./export/NoopSpanProcessor");
+parcelHelpers.exportAll(_noopSpanProcessor, exports);
+var _alwaysOffSampler = require("./sampler/AlwaysOffSampler");
+parcelHelpers.exportAll(_alwaysOffSampler, exports);
+var _alwaysOnSampler = require("./sampler/AlwaysOnSampler");
+parcelHelpers.exportAll(_alwaysOnSampler, exports);
+var _parentBasedSampler = require("./sampler/ParentBasedSampler");
+parcelHelpers.exportAll(_parentBasedSampler, exports);
+var _traceIdRatioBasedSampler = require("./sampler/TraceIdRatioBasedSampler");
+parcelHelpers.exportAll(_traceIdRatioBasedSampler, exports);
+var _sampler = require("./Sampler");
+parcelHelpers.exportAll(_sampler, exports);
+var _span = require("./Span");
+parcelHelpers.exportAll(_span, exports);
+var _spanProcessor = require("./SpanProcessor");
+parcelHelpers.exportAll(_spanProcessor, exports);
+var _timedEvent = require("./TimedEvent");
+parcelHelpers.exportAll(_timedEvent, exports);
+var _types = require("./types");
+parcelHelpers.exportAll(_types, exports);
+var _idGenerator = require("./IdGenerator");
+parcelHelpers.exportAll(_idGenerator, exports);
+
+},{"./Tracer":"zYo79","./BasicTracerProvider":"bv1bF","./platform":"alGsY","./export/ConsoleSpanExporter":"hWVp2","./export/InMemorySpanExporter":"Yr1u5","./export/ReadableSpan":"fSt4P","./export/SimpleSpanProcessor":"Nq2MM","./export/SpanExporter":"lzLTj","./export/NoopSpanProcessor":"j2TGv","./sampler/AlwaysOffSampler":"9FEmX","./sampler/AlwaysOnSampler":"cnZtk","./sampler/ParentBasedSampler":"7pDAK","./sampler/TraceIdRatioBasedSampler":"bqqYo","./Sampler":"2IRN3","./Span":"3tWGt","./SpanProcessor":"iqrBb","./TimedEvent":"hdnwm","./types":"cwYEn","./IdGenerator":"iYvXX","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"zYo79":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Tracer", ()=>Tracer);
+var _api = require("@opentelemetry/api");
+var _core = require("@opentelemetry/core");
+var _span = require("./Span");
+var _utility = require("./utility");
+var _platform = require("./platform");
+/**
+ * This class represents a basic tracer.
+ */ var Tracer = /** @class */ function() {
+    /**
+     * Constructs a new Tracer instance.
+     */ function Tracer(instrumentationLibrary, config, _tracerProvider) {
+        this._tracerProvider = _tracerProvider;
+        var localConfig = (0, _utility.mergeConfig)(config);
+        this._sampler = localConfig.sampler;
+        this._generalLimits = localConfig.generalLimits;
+        this._spanLimits = localConfig.spanLimits;
+        this._idGenerator = config.idGenerator || new (0, _platform.RandomIdGenerator)();
+        this.resource = _tracerProvider.resource;
+        this.instrumentationLibrary = instrumentationLibrary;
+    }
+    /**
+     * Starts a new Span or returns the default NoopSpan based on the sampling
+     * decision.
+     */ Tracer.prototype.startSpan = function(name, options, context) {
+        var _a, _b, _c;
+        if (options === void 0) options = {};
+        if (context === void 0) context = _api.context.active();
+        // remove span from context in case a root span is requested via options
+        if (options.root) context = _api.trace.deleteSpan(context);
+        var parentSpan = _api.trace.getSpan(context);
+        if ((0, _core.isTracingSuppressed)(context)) {
+            _api.diag.debug("Instrumentation suppressed, returning Noop Span");
+            var nonRecordingSpan = _api.trace.wrapSpanContext(_api.INVALID_SPAN_CONTEXT);
+            return nonRecordingSpan;
+        }
+        var parentSpanContext = parentSpan === null || parentSpan === void 0 ? void 0 : parentSpan.spanContext();
+        var spanId = this._idGenerator.generateSpanId();
+        var traceId;
+        var traceState;
+        var parentSpanId;
+        if (!parentSpanContext || !_api.trace.isSpanContextValid(parentSpanContext)) // New root span.
+        traceId = this._idGenerator.generateTraceId();
+        else {
+            // New child span.
+            traceId = parentSpanContext.traceId;
+            traceState = parentSpanContext.traceState;
+            parentSpanId = parentSpanContext.spanId;
+        }
+        var spanKind = (_a = options.kind) !== null && _a !== void 0 ? _a : _api.SpanKind.INTERNAL;
+        var links = ((_b = options.links) !== null && _b !== void 0 ? _b : []).map(function(link) {
+            return {
+                context: link.context,
+                attributes: (0, _core.sanitizeAttributes)(link.attributes)
+            };
+        });
+        var attributes = (0, _core.sanitizeAttributes)(options.attributes);
+        // make sampling decision
+        var samplingResult = this._sampler.shouldSample(context, traceId, name, spanKind, attributes, links);
+        traceState = (_c = samplingResult.traceState) !== null && _c !== void 0 ? _c : traceState;
+        var traceFlags = samplingResult.decision === _api.SamplingDecision.RECORD_AND_SAMPLED ? _api.TraceFlags.SAMPLED : _api.TraceFlags.NONE;
+        var spanContext = {
+            traceId: traceId,
+            spanId: spanId,
+            traceFlags: traceFlags,
+            traceState: traceState
+        };
+        if (samplingResult.decision === _api.SamplingDecision.NOT_RECORD) {
+            _api.diag.debug("Recording is off, propagating context in a non-recording span");
+            var nonRecordingSpan = _api.trace.wrapSpanContext(spanContext);
+            return nonRecordingSpan;
+        }
+        // Set initial span attributes. The attributes object may have been mutated
+        // by the sampler, so we sanitize the merged attributes before setting them.
+        var initAttributes = (0, _core.sanitizeAttributes)(Object.assign(attributes, samplingResult.attributes));
+        var span = new (0, _span.Span)(this, context, name, spanContext, spanKind, parentSpanId, links, options.startTime, undefined, initAttributes);
+        return span;
+    };
+    Tracer.prototype.startActiveSpan = function(name, arg2, arg3, arg4) {
+        var opts;
+        var ctx;
+        var fn;
+        if (arguments.length < 2) return;
+        else if (arguments.length === 2) fn = arg2;
+        else if (arguments.length === 3) {
+            opts = arg2;
+            fn = arg3;
+        } else {
+            opts = arg2;
+            ctx = arg3;
+            fn = arg4;
+        }
+        var parentContext = ctx !== null && ctx !== void 0 ? ctx : _api.context.active();
+        var span = this.startSpan(name, opts, parentContext);
+        var contextWithSpanSet = _api.trace.setSpan(parentContext, span);
+        return _api.context.with(contextWithSpanSet, fn, undefined, span);
+    };
+    /** Returns the active {@link GeneralLimits}. */ Tracer.prototype.getGeneralLimits = function() {
+        return this._generalLimits;
+    };
+    /** Returns the active {@link SpanLimits}. */ Tracer.prototype.getSpanLimits = function() {
+        return this._spanLimits;
+    };
+    Tracer.prototype.getActiveSpanProcessor = function() {
+        return this._tracerProvider.getActiveSpanProcessor();
+    };
+    return Tracer;
+}();
+
+},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","./Span":"3tWGt","./utility":"99Faf","./platform":"alGsY","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"3tWGt":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -7761,7 +8524,7 @@ var __read = undefined && undefined.__read || function(o, n) {
     return Span;
 }();
 
-},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","@opentelemetry/semantic-conventions":"lCgfj","./enums":"7XjQf","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"7XjQf":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","@opentelemetry/semantic-conventions":"lCgfj","./enums":"7XjQf","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"7XjQf":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -7782,7 +8545,7 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "ExceptionEventName", ()=>ExceptionEventName);
 var ExceptionEventName = "exception";
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"99Faf":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"99Faf":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -7835,7 +8598,7 @@ function reconfigureLimits(userConfig) {
     });
 }
 
-},{"./config":"jo0pp","@opentelemetry/core":"dBsXh","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"jo0pp":[function(require,module,exports) {
+},{"./config":"jo0pp","@opentelemetry/core":"dBsXh","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"jo0pp":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -7934,7 +8697,7 @@ function getSamplerProbabilityFromEnv(environment) {
     return probability;
 }
 
-},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","./sampler/AlwaysOffSampler":"9FEmX","./sampler/AlwaysOnSampler":"cnZtk","./sampler/ParentBasedSampler":"7pDAK","./sampler/TraceIdRatioBasedSampler":"bqqYo","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"9FEmX":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","./sampler/AlwaysOffSampler":"9FEmX","./sampler/AlwaysOnSampler":"cnZtk","./sampler/ParentBasedSampler":"7pDAK","./sampler/TraceIdRatioBasedSampler":"bqqYo","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"9FEmX":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -7966,7 +8729,7 @@ var _sampler = require("../Sampler");
     return AlwaysOffSampler;
 }();
 
-},{"../Sampler":"2IRN3","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"2IRN3":[function(require,module,exports) {
+},{"../Sampler":"2IRN3","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"2IRN3":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -8003,7 +8766,7 @@ var SamplingDecision;
      */ SamplingDecision[SamplingDecision["RECORD_AND_SAMPLED"] = 2] = "RECORD_AND_SAMPLED";
 })(SamplingDecision || (SamplingDecision = {}));
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"cnZtk":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"cnZtk":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -8035,7 +8798,7 @@ var _sampler = require("../Sampler");
     return AlwaysOnSampler;
 }();
 
-},{"../Sampler":"2IRN3","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"7pDAK":[function(require,module,exports) {
+},{"../Sampler":"2IRN3","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"7pDAK":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -8089,7 +8852,7 @@ var _alwaysOnSampler = require("./AlwaysOnSampler");
     return ParentBasedSampler;
 }();
 
-},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","./AlwaysOffSampler":"9FEmX","./AlwaysOnSampler":"cnZtk","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"bqqYo":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","./AlwaysOffSampler":"9FEmX","./AlwaysOnSampler":"cnZtk","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"bqqYo":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -8140,7 +8903,7 @@ var _sampler = require("../Sampler");
     return TraceIdRatioBasedSampler;
 }();
 
-},{"@opentelemetry/api":"6AC4z","../Sampler":"2IRN3","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"alGsY":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","../Sampler":"2IRN3","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"alGsY":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -8162,7 +8925,7 @@ parcelHelpers.exportAll(_batchSpanProcessor, exports);
 var _randomIdGenerator = require("./RandomIdGenerator");
 parcelHelpers.exportAll(_randomIdGenerator, exports);
 
-},{"./export/BatchSpanProcessor":"cdQdB","./RandomIdGenerator":"5UX5u","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"cdQdB":[function(require,module,exports) {
+},{"./export/BatchSpanProcessor":"cdQdB","./RandomIdGenerator":"5UX5u","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"cdQdB":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -8231,7 +8994,7 @@ var BatchSpanProcessor = /** @class */ function(_super) {
     return BatchSpanProcessor;
 }((0, _batchSpanProcessorBase.BatchSpanProcessorBase));
 
-},{"../../../export/BatchSpanProcessorBase":"bVOll","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"bVOll":[function(require,module,exports) {
+},{"../../../export/BatchSpanProcessorBase":"bVOll","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"bVOll":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -8403,7 +9166,7 @@ var _core = require("@opentelemetry/core");
     return BatchSpanProcessorBase;
 }();
 
-},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"5UX5u":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"5UX5u":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -8448,7 +9211,7 @@ function getIdGenerator(bytes) {
     };
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"bv1bF":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"bv1bF":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -8638,7 +9401,7 @@ var ForceFlushState;
     return BasicTracerProvider;
 }();
 
-},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","@opentelemetry/resources":"loqSh",".":"jj5uM","./config":"jo0pp","./MultiSpanProcessor":"5mHtM","./export/NoopSpanProcessor":"j2TGv","./platform":"alGsY","./utility":"99Faf","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"loqSh":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","@opentelemetry/resources":"loqSh",".":"jj5uM","./config":"jo0pp","./MultiSpanProcessor":"5mHtM","./export/NoopSpanProcessor":"j2TGv","./platform":"alGsY","./utility":"99Faf","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"loqSh":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -8670,7 +9433,7 @@ parcelHelpers.exportAll(_detectors, exports);
 var _detectResources = require("./detect-resources");
 parcelHelpers.exportAll(_detectResources, exports);
 
-},{"./Resource":"205Or","./IResource":false,"./platform":false,"./types":false,"./config":false,"./detectors":false,"./detect-resources":false,"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"205Or":[function(require,module,exports) {
+},{"./Resource":"205Or","./IResource":false,"./platform":false,"./types":false,"./config":false,"./detectors":false,"./detect-resources":false,"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"205Or":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -8943,7 +9706,7 @@ var __read = undefined && undefined.__read || function(o, n) {
     return Resource;
 }();
 
-},{"@opentelemetry/api":"6AC4z","@opentelemetry/semantic-conventions":"lCgfj","@opentelemetry/core":"dBsXh","./platform":"4c85l","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"4c85l":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@opentelemetry/semantic-conventions":"lCgfj","@opentelemetry/core":"dBsXh","./platform":"4c85l","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"4c85l":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -8975,7 +9738,7 @@ parcelHelpers.exportAll(_processDetector, exports);
 var _processDetectorSync = require("./ProcessDetectorSync");
 parcelHelpers.exportAll(_processDetectorSync, exports);
 
-},{"./default-service-name":"7YE6D","./HostDetector":false,"./OSDetector":false,"./HostDetectorSync":false,"./OSDetectorSync":false,"./ProcessDetector":false,"./ProcessDetectorSync":false,"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"7YE6D":[function(require,module,exports) {
+},{"./default-service-name":"7YE6D","./HostDetector":false,"./OSDetector":false,"./HostDetectorSync":false,"./OSDetectorSync":false,"./ProcessDetector":false,"./ProcessDetectorSync":false,"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"7YE6D":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -8997,7 +9760,7 @@ function defaultServiceName() {
     return "unknown_service";
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"5mHtM":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"5mHtM":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -9131,7 +9894,7 @@ var __values = undefined && undefined.__values || function(o) {
     return MultiSpanProcessor;
 }();
 
-},{"@opentelemetry/core":"dBsXh","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"j2TGv":[function(require,module,exports) {
+},{"@opentelemetry/core":"dBsXh","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"j2TGv":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -9162,7 +9925,7 @@ var NoopSpanProcessor = /** @class */ function() {
     return NoopSpanProcessor;
 }();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"hWVp2":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"hWVp2":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -9269,7 +10032,7 @@ var __values = undefined && undefined.__values || function(o) {
     return ConsoleSpanExporter;
 }();
 
-},{"@opentelemetry/core":"dBsXh","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"Yr1u5":[function(require,module,exports) {
+},{"@opentelemetry/core":"dBsXh","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"Yr1u5":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -9360,7 +10123,7 @@ var __spreadArray = undefined && undefined.__spreadArray || function(to, from, p
     return InMemorySpanExporter;
 }();
 
-},{"@opentelemetry/core":"dBsXh","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"fSt4P":[function(require,module,exports) {
+},{"@opentelemetry/core":"dBsXh","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"fSt4P":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -9378,7 +10141,7 @@ var __spreadArray = undefined && undefined.__spreadArray || function(to, from, p
  */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"Nq2MM":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"Nq2MM":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -9600,7 +10363,7 @@ var __generator = undefined && undefined.__generator || function(thisArg, body) 
     return SimpleSpanProcessor;
 }();
 
-},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"lzLTj":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"lzLTj":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -9618,7 +10381,7 @@ var __generator = undefined && undefined.__generator || function(thisArg, body) 
  */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"iqrBb":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"iqrBb":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -9636,7 +10399,7 @@ parcelHelpers.defineInteropFlag(exports);
  */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"hdnwm":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"hdnwm":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -9654,7 +10417,7 @@ parcelHelpers.defineInteropFlag(exports);
  */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"cwYEn":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"cwYEn":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -9672,7 +10435,7 @@ parcelHelpers.defineInteropFlag(exports);
  */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"iYvXX":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"iYvXX":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -9690,7 +10453,7 @@ parcelHelpers.defineInteropFlag(exports);
  */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"dXLQl":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"dXLQl":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -9827,7 +10590,7 @@ var __spreadArray = undefined && undefined.__spreadArray || function(to, from, p
     return StackContextManager;
 }();
 
-},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"eNyqo":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"eNyqo":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -9871,7 +10634,7 @@ var PerformanceTimingNames;
     PerformanceTimingNames["UNLOAD_EVENT_START"] = "unloadEventStart";
 })(PerformanceTimingNames || (PerformanceTimingNames = {}));
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"5dYQ0":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"5dYQ0":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -10151,7 +10914,2443 @@ function shouldPropagateTraceHeaders(spanUrl, propagateTraceHeaderCorsUrls) {
     });
 }
 
-},{"./enums/PerformanceTimingNames":"eNyqo","@opentelemetry/core":"dBsXh","@opentelemetry/semantic-conventions":"lCgfj","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"cmUfS":[function(require,module,exports) {
+},{"./enums/PerformanceTimingNames":"eNyqo","@opentelemetry/core":"dBsXh","@opentelemetry/semantic-conventions":"lCgfj","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"3OTpd":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "InstrumentationBase", ()=>(0, _index.InstrumentationBase));
+parcelHelpers.export(exports, "InstrumentationNodeModuleDefinition", ()=>(0, _instrumentationNodeModuleDefinition.InstrumentationNodeModuleDefinition));
+parcelHelpers.export(exports, "InstrumentationNodeModuleFile", ()=>(0, _instrumentationNodeModuleFile.InstrumentationNodeModuleFile));
+var _autoLoader = require("./autoLoader");
+parcelHelpers.exportAll(_autoLoader, exports);
+var _index = require("./platform/index");
+var _instrumentationNodeModuleDefinition = require("./instrumentationNodeModuleDefinition");
+var _instrumentationNodeModuleFile = require("./instrumentationNodeModuleFile");
+var _types = require("./types");
+parcelHelpers.exportAll(_types, exports);
+var _typesInternal = require("./types_internal");
+parcelHelpers.exportAll(_typesInternal, exports);
+var _utils = require("./utils");
+parcelHelpers.exportAll(_utils, exports);
+
+},{"./autoLoader":"4D6OU","./platform/index":"lLPwY","./instrumentationNodeModuleDefinition":false,"./instrumentationNodeModuleFile":false,"./types":false,"./types_internal":false,"./utils":"3YarC","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"4D6OU":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+/**
+ * It will register instrumentations and plugins
+ * @param options
+ * @return returns function to unload instrumentation and plugins that were
+ *   registered
+ */ parcelHelpers.export(exports, "registerInstrumentations", ()=>registerInstrumentations);
+var _api = require("@opentelemetry/api");
+var _apiLogs = require("@opentelemetry/api-logs");
+var _autoLoaderUtils = require("./autoLoaderUtils");
+function registerInstrumentations(options) {
+    var instrumentations = (0, _autoLoaderUtils.parseInstrumentationOptions)(options.instrumentations).instrumentations;
+    var tracerProvider = options.tracerProvider || (0, _api.trace).getTracerProvider();
+    var meterProvider = options.meterProvider || (0, _api.metrics).getMeterProvider();
+    var loggerProvider = options.loggerProvider || (0, _apiLogs.logs).getLoggerProvider();
+    (0, _autoLoaderUtils.enableInstrumentations)(instrumentations, tracerProvider, meterProvider, loggerProvider);
+    return function() {
+        (0, _autoLoaderUtils.disableInstrumentations)(instrumentations);
+    };
+}
+
+},{"@opentelemetry/api":"6AC4z","@opentelemetry/api-logs":"8PPAH","./autoLoaderUtils":"7OC7p","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"8PPAH":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "logs", ()=>logs);
+var _logger = require("./types/Logger");
+parcelHelpers.exportAll(_logger, exports);
+var _loggerProvider = require("./types/LoggerProvider");
+parcelHelpers.exportAll(_loggerProvider, exports);
+var _logRecord = require("./types/LogRecord");
+parcelHelpers.exportAll(_logRecord, exports);
+var _loggerOptions = require("./types/LoggerOptions");
+parcelHelpers.exportAll(_loggerOptions, exports);
+var _anyValue = require("./types/AnyValue");
+parcelHelpers.exportAll(_anyValue, exports);
+var _noopLogger = require("./NoopLogger");
+parcelHelpers.exportAll(_noopLogger, exports);
+var _noopLoggerProvider = require("./NoopLoggerProvider");
+parcelHelpers.exportAll(_noopLoggerProvider, exports);
+var _logs = require("./api/logs");
+var logs = (0, _logs.LogsAPI).getInstance();
+
+},{"./types/Logger":false,"./types/LoggerProvider":false,"./types/LogRecord":false,"./types/LoggerOptions":false,"./types/AnyValue":false,"./NoopLogger":false,"./NoopLoggerProvider":false,"./api/logs":"bJuoF","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"3wEsI":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "NoopLogger", ()=>NoopLogger);
+parcelHelpers.export(exports, "NOOP_LOGGER", ()=>NOOP_LOGGER);
+var NoopLogger = /** @class */ function() {
+    function NoopLogger() {}
+    NoopLogger.prototype.emit = function(_logRecord) {};
+    return NoopLogger;
+}();
+var NOOP_LOGGER = new NoopLogger();
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"d2o09":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "NoopLoggerProvider", ()=>NoopLoggerProvider);
+parcelHelpers.export(exports, "NOOP_LOGGER_PROVIDER", ()=>NOOP_LOGGER_PROVIDER);
+var _noopLogger = require("./NoopLogger");
+var NoopLoggerProvider = /** @class */ function() {
+    function NoopLoggerProvider() {}
+    NoopLoggerProvider.prototype.getLogger = function(_name, _version, _options) {
+        return new (0, _noopLogger.NoopLogger)();
+    };
+    return NoopLoggerProvider;
+}();
+var NOOP_LOGGER_PROVIDER = new NoopLoggerProvider();
+
+},{"./NoopLogger":"3wEsI","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"bJuoF":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "LogsAPI", ()=>LogsAPI);
+var _globalUtils = require("../internal/global-utils");
+var _noopLoggerProvider = require("../NoopLoggerProvider");
+var LogsAPI = /** @class */ function() {
+    function LogsAPI() {}
+    LogsAPI.getInstance = function() {
+        if (!this._instance) this._instance = new LogsAPI();
+        return this._instance;
+    };
+    LogsAPI.prototype.setGlobalLoggerProvider = function(provider) {
+        if ((0, _globalUtils._global)[0, _globalUtils.GLOBAL_LOGS_API_KEY]) return this.getLoggerProvider();
+        (0, _globalUtils._global)[0, _globalUtils.GLOBAL_LOGS_API_KEY] = (0, _globalUtils.makeGetter)((0, _globalUtils.API_BACKWARDS_COMPATIBILITY_VERSION), provider, (0, _noopLoggerProvider.NOOP_LOGGER_PROVIDER));
+        return provider;
+    };
+    /**
+     * Returns the global logger provider.
+     *
+     * @returns LoggerProvider
+     */ LogsAPI.prototype.getLoggerProvider = function() {
+        var _a, _b;
+        return (_b = (_a = (0, _globalUtils._global)[0, _globalUtils.GLOBAL_LOGS_API_KEY]) === null || _a === void 0 ? void 0 : _a.call((0, _globalUtils._global), (0, _globalUtils.API_BACKWARDS_COMPATIBILITY_VERSION))) !== null && _b !== void 0 ? _b : (0, _noopLoggerProvider.NOOP_LOGGER_PROVIDER);
+    };
+    /**
+     * Returns a logger from the global logger provider.
+     *
+     * @returns Logger
+     */ LogsAPI.prototype.getLogger = function(name, version, options) {
+        return this.getLoggerProvider().getLogger(name, version, options);
+    };
+    /** Remove the global logger provider */ LogsAPI.prototype.disable = function() {
+        delete (0, _globalUtils._global)[0, _globalUtils.GLOBAL_LOGS_API_KEY];
+    };
+    return LogsAPI;
+}();
+
+},{"../internal/global-utils":"glyIT","../NoopLoggerProvider":"d2o09","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"glyIT":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "GLOBAL_LOGS_API_KEY", ()=>GLOBAL_LOGS_API_KEY);
+parcelHelpers.export(exports, "_global", ()=>_global);
+/**
+ * Make a function which accepts a version integer and returns the instance of an API if the version
+ * is compatible, or a fallback version (usually NOOP) if it is not.
+ *
+ * @param requiredVersion Backwards compatibility version which is required to return the instance
+ * @param instance Instance which should be returned if the required version is compatible
+ * @param fallback Fallback instance, usually NOOP, which will be returned if the required version is not compatible
+ */ parcelHelpers.export(exports, "makeGetter", ()=>makeGetter);
+parcelHelpers.export(exports, "API_BACKWARDS_COMPATIBILITY_VERSION", ()=>API_BACKWARDS_COMPATIBILITY_VERSION);
+var _platform = require("../platform");
+var GLOBAL_LOGS_API_KEY = Symbol.for("io.opentelemetry.js.api.logs");
+var _global = (0, _platform._globalThis);
+function makeGetter(requiredVersion, instance, fallback) {
+    return function(version) {
+        return version === requiredVersion ? instance : fallback;
+    };
+}
+var API_BACKWARDS_COMPATIBILITY_VERSION = 1;
+
+},{"../platform":"cicGq","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"cicGq":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _globalThis = require("./globalThis");
+parcelHelpers.exportAll(_globalThis, exports);
+
+},{"./globalThis":"7NLgd","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"7NLgd":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ // Updates to this file should also be replicated to @opentelemetry/api and
+// @opentelemetry/core too.
+/**
+ * - globalThis (New standard)
+ * - self (Will return the current window instance for supported browsers)
+ * - window (fallback for older browser implementations)
+ * - global (NodeJS implementation)
+ * - <object> (When all else fails)
+ */ /** only globals that common to node and browsers are allowed */ // eslint-disable-next-line node/no-unsupported-features/es-builtins, no-undef
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "_globalThis", ()=>_globalThis);
+var global = arguments[3];
+var _globalThis = typeof globalThis === "object" ? globalThis : typeof self === "object" ? self : typeof window === "object" ? window : typeof global === "object" ? global : {};
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"7OC7p":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ /**
+ * Parses the options and returns instrumentations, node plugins and
+ *   web plugins
+ * @param options
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "parseInstrumentationOptions", ()=>parseInstrumentationOptions);
+/**
+ * Enable instrumentations
+ * @param instrumentations
+ * @param tracerProvider
+ * @param meterProvider
+ */ parcelHelpers.export(exports, "enableInstrumentations", ()=>enableInstrumentations);
+/**
+ * Disable instrumentations
+ * @param instrumentations
+ */ parcelHelpers.export(exports, "disableInstrumentations", ()=>disableInstrumentations);
+function parseInstrumentationOptions(options) {
+    if (options === void 0) options = [];
+    var instrumentations = [];
+    for(var i = 0, j = options.length; i < j; i++){
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        var option = options[i];
+        if (Array.isArray(option)) {
+            var results = parseInstrumentationOptions(option);
+            instrumentations = instrumentations.concat(results.instrumentations);
+        } else if (typeof option === "function") instrumentations.push(new option());
+        else if (option.instrumentationName) instrumentations.push(option);
+    }
+    return {
+        instrumentations: instrumentations
+    };
+}
+function enableInstrumentations(instrumentations, tracerProvider, meterProvider, loggerProvider) {
+    for(var i = 0, j = instrumentations.length; i < j; i++){
+        var instrumentation = instrumentations[i];
+        if (tracerProvider) instrumentation.setTracerProvider(tracerProvider);
+        if (meterProvider) instrumentation.setMeterProvider(meterProvider);
+        if (loggerProvider && instrumentation.setLoggerProvider) instrumentation.setLoggerProvider(loggerProvider);
+        // instrumentations have been already enabled during creation
+        // so enable only if user prevented that by setting enabled to false
+        // this is to prevent double enabling but when calling register all
+        // instrumentations should be now enabled
+        if (!instrumentation.getConfig().enabled) instrumentation.enable();
+    }
+}
+function disableInstrumentations(instrumentations) {
+    instrumentations.forEach(function(instrumentation) {
+        return instrumentation.disable();
+    });
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"lLPwY":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "InstrumentationBase", ()=>(0, _instrumentation.InstrumentationBase));
+parcelHelpers.export(exports, "normalize", ()=>(0, _noopNormalize.normalize));
+var _instrumentation = require("./instrumentation");
+var _noopNormalize = require("./noop-normalize");
+
+},{"./instrumentation":"hCn2q","./noop-normalize":false,"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"hCn2q":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "InstrumentationBase", ()=>InstrumentationBase);
+var _instrumentation = require("../../instrumentation");
+var __extends = undefined && undefined.__extends || function() {
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || ({
+            __proto__: []
+        }) instanceof Array && function(d, b) {
+            d.__proto__ = b;
+        } || function(d, b) {
+            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+        };
+        return extendStatics(d, b);
+    };
+    return function(d, b) {
+        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() {
+            this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+}();
+/**
+ * Base abstract class for instrumenting web plugins
+ */ var InstrumentationBase = /** @class */ function(_super) {
+    __extends(InstrumentationBase, _super);
+    function InstrumentationBase(instrumentationName, instrumentationVersion, config) {
+        if (config === void 0) config = {};
+        var _this = _super.call(this, instrumentationName, instrumentationVersion, config) || this;
+        if (_this._config.enabled) _this.enable();
+        return _this;
+    }
+    return InstrumentationBase;
+}((0, _instrumentation.InstrumentationAbstract));
+
+},{"../../instrumentation":"jMsGo","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"jMsGo":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "InstrumentationAbstract", ()=>InstrumentationAbstract);
+var _api = require("@opentelemetry/api");
+var _apiLogs = require("@opentelemetry/api-logs");
+var _shimmer = require("shimmer");
+var __assign = undefined && undefined.__assign || function() {
+    __assign = Object.assign || function(t) {
+        for(var s, i = 1, n = arguments.length; i < n; i++){
+            s = arguments[i];
+            for(var p in s)if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+/**
+ * Base abstract internal class for instrumenting node and web plugins
+ */ var InstrumentationAbstract = /** @class */ function() {
+    function InstrumentationAbstract(instrumentationName, instrumentationVersion, config) {
+        if (config === void 0) config = {};
+        this.instrumentationName = instrumentationName;
+        this.instrumentationVersion = instrumentationVersion;
+        /* Api to wrap instrumented method */ this._wrap = _shimmer.wrap;
+        /* Api to unwrap instrumented methods */ this._unwrap = _shimmer.unwrap;
+        /* Api to mass wrap instrumented method */ this._massWrap = _shimmer.massWrap;
+        /* Api to mass unwrap instrumented methods */ this._massUnwrap = _shimmer.massUnwrap;
+        this._config = __assign({
+            enabled: true
+        }, config);
+        this._diag = (0, _api.diag).createComponentLogger({
+            namespace: instrumentationName
+        });
+        this._tracer = (0, _api.trace).getTracer(instrumentationName, instrumentationVersion);
+        this._meter = (0, _api.metrics).getMeter(instrumentationName, instrumentationVersion);
+        this._logger = (0, _apiLogs.logs).getLogger(instrumentationName, instrumentationVersion);
+        this._updateMetricInstruments();
+    }
+    Object.defineProperty(InstrumentationAbstract.prototype, "meter", {
+        /* Returns meter */ get: function() {
+            return this._meter;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    /**
+     * Sets MeterProvider to this plugin
+     * @param meterProvider
+     */ InstrumentationAbstract.prototype.setMeterProvider = function(meterProvider) {
+        this._meter = meterProvider.getMeter(this.instrumentationName, this.instrumentationVersion);
+        this._updateMetricInstruments();
+    };
+    Object.defineProperty(InstrumentationAbstract.prototype, "logger", {
+        /* Returns logger */ get: function() {
+            return this._logger;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    /**
+     * Sets LoggerProvider to this plugin
+     * @param loggerProvider
+     */ InstrumentationAbstract.prototype.setLoggerProvider = function(loggerProvider) {
+        this._logger = loggerProvider.getLogger(this.instrumentationName, this.instrumentationVersion);
+    };
+    /**
+     * @experimental
+     *
+     * Get module definitions defined by {@link init}.
+     * This can be used for experimental compile-time instrumentation.
+     *
+     * @returns an array of {@link InstrumentationModuleDefinition}
+     */ InstrumentationAbstract.prototype.getModuleDefinitions = function() {
+        var _a;
+        var initResult = (_a = this.init()) !== null && _a !== void 0 ? _a : [];
+        if (!Array.isArray(initResult)) return [
+            initResult
+        ];
+        return initResult;
+    };
+    /**
+     * Sets the new metric instruments with the current Meter.
+     */ InstrumentationAbstract.prototype._updateMetricInstruments = function() {
+        return;
+    };
+    /* Returns InstrumentationConfig */ InstrumentationAbstract.prototype.getConfig = function() {
+        return this._config;
+    };
+    /**
+     * Sets InstrumentationConfig to this plugin
+     * @param InstrumentationConfig
+     */ InstrumentationAbstract.prototype.setConfig = function(config) {
+        if (config === void 0) config = {};
+        this._config = Object.assign({}, config);
+    };
+    /**
+     * Sets TraceProvider to this plugin
+     * @param tracerProvider
+     */ InstrumentationAbstract.prototype.setTracerProvider = function(tracerProvider) {
+        this._tracer = tracerProvider.getTracer(this.instrumentationName, this.instrumentationVersion);
+    };
+    Object.defineProperty(InstrumentationAbstract.prototype, "tracer", {
+        /* Returns tracer */ get: function() {
+            return this._tracer;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    return InstrumentationAbstract;
+}();
+
+},{"@opentelemetry/api":"6AC4z","@opentelemetry/api-logs":"8PPAH","shimmer":"kGpxk","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"kGpxk":[function(require,module,exports) {
+"use strict";
+function isFunction(funktion) {
+    return typeof funktion === "function";
+}
+// Default to complaining loudly when things don't go according to plan.
+var logger = console.error.bind(console);
+// Sets a property on an object, preserving its enumerability.
+// This function assumes that the property is already writable.
+function defineProperty(obj, name, value) {
+    var enumerable = !!obj[name] && obj.propertyIsEnumerable(name);
+    Object.defineProperty(obj, name, {
+        configurable: true,
+        enumerable: enumerable,
+        writable: true,
+        value: value
+    });
+}
+// Keep initialization idempotent.
+function shimmer(options) {
+    if (options && options.logger) {
+        if (!isFunction(options.logger)) logger("new logger isn't a function, not replacing");
+        else logger = options.logger;
+    }
+}
+function wrap(nodule, name, wrapper) {
+    if (!nodule || !nodule[name]) {
+        logger("no original function " + name + " to wrap");
+        return;
+    }
+    if (!wrapper) {
+        logger("no wrapper function");
+        logger(new Error().stack);
+        return;
+    }
+    if (!isFunction(nodule[name]) || !isFunction(wrapper)) {
+        logger("original object and wrapper must be functions");
+        return;
+    }
+    var original = nodule[name];
+    var wrapped = wrapper(original, name);
+    defineProperty(wrapped, "__original", original);
+    defineProperty(wrapped, "__unwrap", function() {
+        if (nodule[name] === wrapped) defineProperty(nodule, name, original);
+    });
+    defineProperty(wrapped, "__wrapped", true);
+    defineProperty(nodule, name, wrapped);
+    return wrapped;
+}
+function massWrap(nodules, names, wrapper) {
+    if (!nodules) {
+        logger("must provide one or more modules to patch");
+        logger(new Error().stack);
+        return;
+    } else if (!Array.isArray(nodules)) nodules = [
+        nodules
+    ];
+    if (!(names && Array.isArray(names))) {
+        logger("must provide one or more functions to wrap on modules");
+        return;
+    }
+    nodules.forEach(function(nodule) {
+        names.forEach(function(name) {
+            wrap(nodule, name, wrapper);
+        });
+    });
+}
+function unwrap(nodule, name) {
+    if (!nodule || !nodule[name]) {
+        logger("no function to unwrap.");
+        logger(new Error().stack);
+        return;
+    }
+    if (!nodule[name].__unwrap) logger("no original to unwrap to -- has " + name + " already been unwrapped?");
+    else return nodule[name].__unwrap();
+}
+function massUnwrap(nodules, names) {
+    if (!nodules) {
+        logger("must provide one or more modules to patch");
+        logger(new Error().stack);
+        return;
+    } else if (!Array.isArray(nodules)) nodules = [
+        nodules
+    ];
+    if (!(names && Array.isArray(names))) {
+        logger("must provide one or more functions to unwrap on modules");
+        return;
+    }
+    nodules.forEach(function(nodule) {
+        names.forEach(function(name) {
+            unwrap(nodule, name);
+        });
+    });
+}
+shimmer.wrap = wrap;
+shimmer.massWrap = massWrap;
+shimmer.unwrap = unwrap;
+shimmer.massUnwrap = massUnwrap;
+module.exports = shimmer;
+
+},{}],"3YarC":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+/**
+ * function to execute patched function and being able to catch errors
+ * @param execute - function to be executed
+ * @param onFinish - callback to run when execute finishes
+ */ parcelHelpers.export(exports, "safeExecuteInTheMiddle", ()=>safeExecuteInTheMiddle);
+/**
+ * Async function to execute patched function and being able to catch errors
+ * @param execute - function to be executed
+ * @param onFinish - callback to run when execute finishes
+ */ parcelHelpers.export(exports, "safeExecuteInTheMiddleAsync", ()=>safeExecuteInTheMiddleAsync);
+/**
+ * Checks if certain function has been already wrapped
+ * @param func
+ */ parcelHelpers.export(exports, "isWrapped", ()=>isWrapped);
+var __awaiter = undefined && undefined.__awaiter || function(thisArg, _arguments, P, generator) {
+    function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+            resolve(value);
+        });
+    }
+    return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+            try {
+                step(generator.next(value));
+            } catch (e) {
+                reject(e);
+            }
+        }
+        function rejected(value) {
+            try {
+                step(generator["throw"](value));
+            } catch (e) {
+                reject(e);
+            }
+        }
+        function step(result) {
+            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = undefined && undefined.__generator || function(thisArg, body) {
+    var _ = {
+        label: 0,
+        sent: function() {
+            if (t[0] & 1) throw t[1];
+            return t[1];
+        },
+        trys: [],
+        ops: []
+    }, f, y, t, g;
+    return g = {
+        next: verb(0),
+        "throw": verb(1),
+        "return": verb(2)
+    }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+        return this;
+    }), g;
+    function verb(n) {
+        return function(v) {
+            return step([
+                n,
+                v
+            ]);
+        };
+    }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while(_)try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [
+                op[0] & 2,
+                t.value
+            ];
+            switch(op[0]){
+                case 0:
+                case 1:
+                    t = op;
+                    break;
+                case 4:
+                    _.label++;
+                    return {
+                        value: op[1],
+                        done: false
+                    };
+                case 5:
+                    _.label++;
+                    y = op[1];
+                    op = [
+                        0
+                    ];
+                    continue;
+                case 7:
+                    op = _.ops.pop();
+                    _.trys.pop();
+                    continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+                        _ = 0;
+                        continue;
+                    }
+                    if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+                        _.label = op[1];
+                        break;
+                    }
+                    if (op[0] === 6 && _.label < t[1]) {
+                        _.label = t[1];
+                        t = op;
+                        break;
+                    }
+                    if (t && _.label < t[2]) {
+                        _.label = t[2];
+                        _.ops.push(op);
+                        break;
+                    }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop();
+                    continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) {
+            op = [
+                6,
+                e
+            ];
+            y = 0;
+        } finally{
+            f = t = 0;
+        }
+        if (op[0] & 5) throw op[1];
+        return {
+            value: op[0] ? op[1] : void 0,
+            done: true
+        };
+    }
+};
+function safeExecuteInTheMiddle(execute, onFinish, preventThrowingError) {
+    var error;
+    var result;
+    try {
+        result = execute();
+    } catch (e) {
+        error = e;
+    } finally{
+        onFinish(error, result);
+        if (error && !preventThrowingError) // eslint-disable-next-line no-unsafe-finally
+        throw error;
+        // eslint-disable-next-line no-unsafe-finally
+        return result;
+    }
+}
+function safeExecuteInTheMiddleAsync(execute, onFinish, preventThrowingError) {
+    return __awaiter(this, void 0, void 0, function() {
+        var error, result, e_1;
+        return __generator(this, function(_a) {
+            switch(_a.label){
+                case 0:
+                    _a.trys.push([
+                        0,
+                        2,
+                        3,
+                        4
+                    ]);
+                    return [
+                        4 /*yield*/ ,
+                        execute()
+                    ];
+                case 1:
+                    result = _a.sent();
+                    return [
+                        3 /*break*/ ,
+                        4
+                    ];
+                case 2:
+                    e_1 = _a.sent();
+                    error = e_1;
+                    return [
+                        3 /*break*/ ,
+                        4
+                    ];
+                case 3:
+                    onFinish(error, result);
+                    if (error && !preventThrowingError) // eslint-disable-next-line no-unsafe-finally
+                    throw error;
+                    // eslint-disable-next-line no-unsafe-finally
+                    return [
+                        2 /*return*/ ,
+                        result
+                    ];
+                case 4:
+                    return [
+                        2 /*return*/ 
+                    ];
+            }
+        });
+    });
+}
+function isWrapped(func) {
+    return typeof func === "function" && typeof func.__original === "function" && typeof func.__unwrap === "function" && func.__wrapped === true;
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"2uTf8":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "AttributeNames", ()=>AttributeNames);
+var AttributeNames;
+(function(AttributeNames) {
+    AttributeNames["DOCUMENT_LOAD"] = "documentLoad";
+    AttributeNames["DOCUMENT_FETCH"] = "documentFetch";
+    AttributeNames["RESOURCE_FETCH"] = "resourceFetch";
+})(AttributeNames || (AttributeNames = {}));
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"kjKSa":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ // this is autogenerated file, see scripts/version-update.js
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "VERSION", ()=>VERSION);
+var VERSION = "0.37.0";
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"hRpx5":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "getPerformanceNavigationEntries", ()=>getPerformanceNavigationEntries);
+parcelHelpers.export(exports, "addSpanPerformancePaintEvents", ()=>addSpanPerformancePaintEvents);
+var _core = require("@opentelemetry/core");
+var _sdkTraceWeb = require("@opentelemetry/sdk-trace-web");
+var _eventNames = require("./enums/EventNames");
+var getPerformanceNavigationEntries = function() {
+    var _a, _b;
+    var entries = {};
+    var performanceNavigationTiming = (_b = (_a = (0, _core.otperformance)).getEntriesByType) === null || _b === void 0 ? void 0 : _b.call(_a, "navigation")[0];
+    if (performanceNavigationTiming) {
+        var keys = Object.values((0, _sdkTraceWeb.PerformanceTimingNames));
+        keys.forEach(function(key) {
+            if ((0, _sdkTraceWeb.hasKey)(performanceNavigationTiming, key)) {
+                var value = performanceNavigationTiming[key];
+                if (typeof value === "number") entries[key] = value;
+            }
+        });
+    } else {
+        // // fallback to previous version
+        var perf = (0, _core.otperformance);
+        var performanceTiming_1 = perf.timing;
+        if (performanceTiming_1) {
+            var keys = Object.values((0, _sdkTraceWeb.PerformanceTimingNames));
+            keys.forEach(function(key) {
+                if ((0, _sdkTraceWeb.hasKey)(performanceTiming_1, key)) {
+                    var value = performanceTiming_1[key];
+                    if (typeof value === "number") entries[key] = value;
+                }
+            });
+        }
+    }
+    return entries;
+};
+var performancePaintNames = {
+    "first-paint": (0, _eventNames.EventNames).FIRST_PAINT,
+    "first-contentful-paint": (0, _eventNames.EventNames).FIRST_CONTENTFUL_PAINT
+};
+var addSpanPerformancePaintEvents = function(span) {
+    var _a, _b;
+    var performancePaintTiming = (_b = (_a = (0, _core.otperformance)).getEntriesByType) === null || _b === void 0 ? void 0 : _b.call(_a, "paint");
+    if (performancePaintTiming) performancePaintTiming.forEach(function(_a) {
+        var name = _a.name, startTime = _a.startTime;
+        if ((0, _sdkTraceWeb.hasKey)(performancePaintNames, name)) span.addEvent(performancePaintNames[name], startTime);
+    });
+};
+
+},{"@opentelemetry/core":"dBsXh","@opentelemetry/sdk-trace-web":"eXZZL","./enums/EventNames":"kWXpn","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"kWXpn":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "EventNames", ()=>EventNames);
+var EventNames;
+(function(EventNames) {
+    EventNames["FIRST_PAINT"] = "firstPaint";
+    EventNames["FIRST_CONTENTFUL_PAINT"] = "firstContentfulPaint";
+})(EventNames || (EventNames = {}));
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"5cOeU":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"iWezV":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _fetch = require("./fetch");
+parcelHelpers.exportAll(_fetch, exports);
+
+},{"./fetch":"3HP4m","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"3HP4m":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "FetchInstrumentation", ()=>FetchInstrumentation);
+var _api = require("@opentelemetry/api");
+var _instrumentation = require("@opentelemetry/instrumentation");
+var _core = require("@opentelemetry/core");
+var _sdkTraceWeb = require("@opentelemetry/sdk-trace-web");
+var _attributeNames = require("./enums/AttributeNames");
+var _semanticConventions = require("@opentelemetry/semantic-conventions");
+var _version = require("./version");
+var process = require("ec4383a7c1392e8d");
+var __extends = undefined && undefined.__extends || function() {
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || ({
+            __proto__: []
+        }) instanceof Array && function(d, b) {
+            d.__proto__ = b;
+        } || function(d, b) {
+            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+        };
+        return extendStatics(d, b);
+    };
+    return function(d, b) {
+        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() {
+            this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+}();
+var _a;
+// how long to wait for observer to collect information about resources
+// this is needed as event "load" is called before observer
+// hard to say how long it should really wait, seems like 300ms is
+// safe enough
+var OBSERVER_WAIT_TIME_MS = 300;
+var isNode = typeof process === "object" && ((_a = process.release) === null || _a === void 0 ? void 0 : _a.name) === "node";
+/**
+ * This class represents a fetch plugin for auto instrumentation
+ */ var FetchInstrumentation = /** @class */ function(_super) {
+    __extends(FetchInstrumentation, _super);
+    function FetchInstrumentation(config) {
+        var _this = _super.call(this, "@opentelemetry/instrumentation-fetch", (0, _version.VERSION), config) || this;
+        _this.component = "fetch";
+        _this.version = (0, _version.VERSION);
+        _this.moduleName = _this.component;
+        _this._usedResources = new WeakSet();
+        _this._tasksCount = 0;
+        return _this;
+    }
+    FetchInstrumentation.prototype.init = function() {};
+    FetchInstrumentation.prototype._getConfig = function() {
+        return this._config;
+    };
+    /**
+     * Add cors pre flight child span
+     * @param span
+     * @param corsPreFlightRequest
+     */ FetchInstrumentation.prototype._addChildSpan = function(span, corsPreFlightRequest) {
+        var childSpan = this.tracer.startSpan("CORS Preflight", {
+            startTime: corsPreFlightRequest[_sdkTraceWeb.PerformanceTimingNames.FETCH_START]
+        }, _api.trace.setSpan(_api.context.active(), span));
+        if (!this._getConfig().ignoreNetworkEvents) _sdkTraceWeb.addSpanNetworkEvents(childSpan, corsPreFlightRequest);
+        childSpan.end(corsPreFlightRequest[_sdkTraceWeb.PerformanceTimingNames.RESPONSE_END]);
+    };
+    /**
+     * Adds more attributes to span just before ending it
+     * @param span
+     * @param response
+     */ FetchInstrumentation.prototype._addFinalSpanAttributes = function(span, response) {
+        var parsedUrl = _sdkTraceWeb.parseUrl(response.url);
+        span.setAttribute((0, _semanticConventions.SemanticAttributes).HTTP_STATUS_CODE, response.status);
+        if (response.statusText != null) span.setAttribute((0, _attributeNames.AttributeNames).HTTP_STATUS_TEXT, response.statusText);
+        span.setAttribute((0, _semanticConventions.SemanticAttributes).HTTP_HOST, parsedUrl.host);
+        span.setAttribute((0, _semanticConventions.SemanticAttributes).HTTP_SCHEME, parsedUrl.protocol.replace(":", ""));
+        if (typeof navigator !== "undefined") span.setAttribute((0, _semanticConventions.SemanticAttributes).HTTP_USER_AGENT, navigator.userAgent);
+    };
+    /**
+     * Add headers
+     * @param options
+     * @param spanUrl
+     */ FetchInstrumentation.prototype._addHeaders = function(options, spanUrl) {
+        if (!_sdkTraceWeb.shouldPropagateTraceHeaders(spanUrl, this._getConfig().propagateTraceHeaderCorsUrls)) {
+            var headers = {};
+            _api.propagation.inject(_api.context.active(), headers);
+            if (Object.keys(headers).length > 0) this._diag.debug("headers inject skipped due to CORS policy");
+            return;
+        }
+        if (options instanceof Request) _api.propagation.inject(_api.context.active(), options.headers, {
+            set: function(h, k, v) {
+                return h.set(k, typeof v === "string" ? v : String(v));
+            }
+        });
+        else if (options.headers instanceof Headers) _api.propagation.inject(_api.context.active(), options.headers, {
+            set: function(h, k, v) {
+                return h.set(k, typeof v === "string" ? v : String(v));
+            }
+        });
+        else if (options.headers instanceof Map) _api.propagation.inject(_api.context.active(), options.headers, {
+            set: function(h, k, v) {
+                return h.set(k, typeof v === "string" ? v : String(v));
+            }
+        });
+        else {
+            var headers = {};
+            _api.propagation.inject(_api.context.active(), headers);
+            options.headers = Object.assign({}, headers, options.headers || {});
+        }
+    };
+    /**
+     * Clears the resource timings and all resources assigned with spans
+     *     when {@link FetchPluginConfig.clearTimingResources} is
+     *     set to true (default false)
+     * @private
+     */ FetchInstrumentation.prototype._clearResources = function() {
+        if (this._tasksCount === 0 && this._getConfig().clearTimingResources) {
+            performance.clearResourceTimings();
+            this._usedResources = new WeakSet();
+        }
+    };
+    /**
+     * Creates a new span
+     * @param url
+     * @param options
+     */ FetchInstrumentation.prototype._createSpan = function(url, options) {
+        var _a;
+        if (options === void 0) options = {};
+        if (_core.isUrlIgnored(url, this._getConfig().ignoreUrls)) {
+            this._diag.debug("ignoring span as url matches ignored url");
+            return;
+        }
+        var method = (options.method || "GET").toUpperCase();
+        var spanName = "HTTP " + method;
+        return this.tracer.startSpan(spanName, {
+            kind: _api.SpanKind.CLIENT,
+            attributes: (_a = {}, _a[(0, _attributeNames.AttributeNames).COMPONENT] = this.moduleName, _a[(0, _semanticConventions.SemanticAttributes).HTTP_METHOD] = method, _a[(0, _semanticConventions.SemanticAttributes).HTTP_URL] = url, _a)
+        });
+    };
+    /**
+     * Finds appropriate resource and add network events to the span
+     * @param span
+     * @param resourcesObserver
+     * @param endTime
+     */ FetchInstrumentation.prototype._findResourceAndAddNetworkEvents = function(span, resourcesObserver, endTime) {
+        var resources = resourcesObserver.entries;
+        if (!resources.length) {
+            if (!performance.getEntriesByType) return;
+            // fallback - either Observer is not available or it took longer
+            // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
+            // information
+            resources = performance.getEntriesByType("resource");
+        }
+        var resource = _sdkTraceWeb.getResource(resourcesObserver.spanUrl, resourcesObserver.startTime, endTime, resources, this._usedResources, "fetch");
+        if (resource.mainRequest) {
+            var mainRequest = resource.mainRequest;
+            this._markResourceAsUsed(mainRequest);
+            var corsPreFlightRequest = resource.corsPreFlightRequest;
+            if (corsPreFlightRequest) {
+                this._addChildSpan(span, corsPreFlightRequest);
+                this._markResourceAsUsed(corsPreFlightRequest);
+            }
+            if (!this._getConfig().ignoreNetworkEvents) _sdkTraceWeb.addSpanNetworkEvents(span, mainRequest);
+        }
+    };
+    /**
+     * Marks certain [resource]{@link PerformanceResourceTiming} when information
+     * from this is used to add events to span.
+     * This is done to avoid reusing the same resource again for next span
+     * @param resource
+     */ FetchInstrumentation.prototype._markResourceAsUsed = function(resource) {
+        this._usedResources.add(resource);
+    };
+    /**
+     * Finish span, add attributes, network events etc.
+     * @param span
+     * @param spanData
+     * @param response
+     */ FetchInstrumentation.prototype._endSpan = function(span, spanData, response) {
+        var _this = this;
+        var endTime = _core.millisToHrTime(Date.now());
+        var performanceEndTime = _core.hrTime();
+        this._addFinalSpanAttributes(span, response);
+        setTimeout(function() {
+            var _a;
+            (_a = spanData.observer) === null || _a === void 0 || _a.disconnect();
+            _this._findResourceAndAddNetworkEvents(span, spanData, performanceEndTime);
+            _this._tasksCount--;
+            _this._clearResources();
+            span.end(endTime);
+        }, OBSERVER_WAIT_TIME_MS);
+    };
+    /**
+     * Patches the constructor of fetch
+     */ FetchInstrumentation.prototype._patchConstructor = function() {
+        var _this = this;
+        return function(original) {
+            var plugin = _this;
+            return function patchConstructor() {
+                var args = [];
+                for(var _i = 0; _i < arguments.length; _i++)args[_i] = arguments[_i];
+                var self = this;
+                var url = _sdkTraceWeb.parseUrl(args[0] instanceof Request ? args[0].url : String(args[0])).href;
+                var options = args[0] instanceof Request ? args[0] : args[1] || {};
+                var createdSpan = plugin._createSpan(url, options);
+                if (!createdSpan) return original.apply(this, args);
+                var spanData = plugin._prepareSpanData(url);
+                function endSpanOnError(span, error) {
+                    plugin._applyAttributesAfterFetch(span, options, error);
+                    plugin._endSpan(span, spanData, {
+                        status: error.status || 0,
+                        statusText: error.message,
+                        url: url
+                    });
+                }
+                function endSpanOnSuccess(span, response) {
+                    plugin._applyAttributesAfterFetch(span, options, response);
+                    if (response.status >= 200 && response.status < 400) plugin._endSpan(span, spanData, response);
+                    else plugin._endSpan(span, spanData, {
+                        status: response.status,
+                        statusText: response.statusText,
+                        url: url
+                    });
+                }
+                function onSuccess(span, resolve, response) {
+                    try {
+                        var resClone = response.clone();
+                        var resClone4Hook_1 = response.clone();
+                        var body = resClone.body;
+                        if (body) {
+                            var reader_1 = body.getReader();
+                            var read_1 = function() {
+                                reader_1.read().then(function(_a) {
+                                    var done = _a.done;
+                                    if (done) endSpanOnSuccess(span, resClone4Hook_1);
+                                    else read_1();
+                                }, function(error) {
+                                    endSpanOnError(span, error);
+                                });
+                            };
+                            read_1();
+                        } else // some older browsers don't have .body implemented
+                        endSpanOnSuccess(span, response);
+                    } finally{
+                        resolve(response);
+                    }
+                }
+                function onError(span, reject, error) {
+                    try {
+                        endSpanOnError(span, error);
+                    } finally{
+                        reject(error);
+                    }
+                }
+                return new Promise(function(resolve, reject) {
+                    return _api.context.with(_api.trace.setSpan(_api.context.active(), createdSpan), function() {
+                        plugin._addHeaders(options, url);
+                        plugin._tasksCount++;
+                        // TypeScript complains about arrow function captured a this typed as globalThis
+                        // ts(7041)
+                        return original.apply(self, options instanceof Request ? [
+                            options
+                        ] : [
+                            url,
+                            options
+                        ]).then(onSuccess.bind(self, createdSpan, resolve), onError.bind(self, createdSpan, reject));
+                    });
+                });
+            };
+        };
+    };
+    FetchInstrumentation.prototype._applyAttributesAfterFetch = function(span, request, result) {
+        var _this = this;
+        var applyCustomAttributesOnSpan = this._getConfig().applyCustomAttributesOnSpan;
+        if (applyCustomAttributesOnSpan) (0, _instrumentation.safeExecuteInTheMiddle)(function() {
+            return applyCustomAttributesOnSpan(span, request, result);
+        }, function(error) {
+            if (!error) return;
+            _this._diag.error("applyCustomAttributesOnSpan", error);
+        }, true);
+    };
+    /**
+     * Prepares a span data - needed later for matching appropriate network
+     *     resources
+     * @param spanUrl
+     */ FetchInstrumentation.prototype._prepareSpanData = function(spanUrl) {
+        var startTime = _core.hrTime();
+        var entries = [];
+        if (typeof PerformanceObserver !== "function") return {
+            entries: entries,
+            startTime: startTime,
+            spanUrl: spanUrl
+        };
+        var observer = new PerformanceObserver(function(list) {
+            var perfObsEntries = list.getEntries();
+            perfObsEntries.forEach(function(entry) {
+                if (entry.initiatorType === "fetch" && entry.name === spanUrl) entries.push(entry);
+            });
+        });
+        observer.observe({
+            entryTypes: [
+                "resource"
+            ]
+        });
+        return {
+            entries: entries,
+            observer: observer,
+            startTime: startTime,
+            spanUrl: spanUrl
+        };
+    };
+    /**
+     * implements enable function
+     */ FetchInstrumentation.prototype.enable = function() {
+        if (isNode) {
+            // Node.js v18+ *does* have a global `fetch()`, but this package does not
+            // support instrumenting it.
+            this._diag.warn("this instrumentation is intended for web usage only, it does not instrument Node.js's fetch()");
+            return;
+        }
+        if ((0, _instrumentation.isWrapped)(fetch)) {
+            this._unwrap((0, _core._globalThis), "fetch");
+            this._diag.debug("removing previous patch for constructor");
+        }
+        this._wrap((0, _core._globalThis), "fetch", this._patchConstructor());
+    };
+    /**
+     * implements unpatch function
+     */ FetchInstrumentation.prototype.disable = function() {
+        if (isNode) return;
+        this._unwrap((0, _core._globalThis), "fetch");
+        this._usedResources = new WeakSet();
+    };
+    return FetchInstrumentation;
+}((0, _instrumentation.InstrumentationBase));
+
+},{"ec4383a7c1392e8d":"d5jf4","@opentelemetry/api":"6AC4z","@opentelemetry/instrumentation":"3OTpd","@opentelemetry/core":"dBsXh","@opentelemetry/sdk-trace-web":"eXZZL","./enums/AttributeNames":"2Hbiw","@opentelemetry/semantic-conventions":"lCgfj","./version":"cZp6b","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"2Hbiw":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ /**
+ * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/http.md
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "AttributeNames", ()=>AttributeNames);
+var AttributeNames;
+(function(AttributeNames) {
+    AttributeNames["COMPONENT"] = "component";
+    AttributeNames["HTTP_ERROR_NAME"] = "http.error_name";
+    AttributeNames["HTTP_STATUS_TEXT"] = "http.status_text";
+})(AttributeNames || (AttributeNames = {}));
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"cZp6b":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ // this is autogenerated file, see scripts/version-update.js
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "VERSION", ()=>VERSION);
+var VERSION = "0.50.0";
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"lOen7":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _instrumentation = require("./instrumentation");
+parcelHelpers.exportAll(_instrumentation, exports);
+var _types = require("./types");
+parcelHelpers.exportAll(_types, exports);
+var _attributeNames = require("./enums/AttributeNames");
+parcelHelpers.exportAll(_attributeNames, exports);
+
+},{"./instrumentation":"5EeMl","./types":false,"./enums/AttributeNames":false,"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"5EeMl":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "UserInteractionInstrumentation", ()=>UserInteractionInstrumentation);
+/// <reference types="zone.js" />
+var _instrumentation = require("@opentelemetry/instrumentation");
+var _api = require("@opentelemetry/api");
+var _core = require("@opentelemetry/core");
+var _sdkTraceWeb = require("@opentelemetry/sdk-trace-web");
+var _attributeNames = require("./enums/AttributeNames");
+var _version = require("./version");
+var __extends = undefined && undefined.__extends || function() {
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || ({
+            __proto__: []
+        }) instanceof Array && function(d, b) {
+            d.__proto__ = b;
+        } || function(d, b) {
+            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+        };
+        return extendStatics(d, b);
+    };
+    return function(d, b) {
+        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() {
+            this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+}();
+var ZONE_CONTEXT_KEY = "OT_ZONE_CONTEXT";
+var EVENT_NAVIGATION_NAME = "Navigation:";
+var DEFAULT_EVENT_NAMES = [
+    "click"
+];
+function defaultShouldPreventSpanCreation() {
+    return false;
+}
+/**
+ * This class represents a UserInteraction plugin for auto instrumentation.
+ * If zone.js is available then it patches the zone otherwise it patches
+ * addEventListener of HTMLElement
+ */ var UserInteractionInstrumentation = /** @class */ function(_super) {
+    __extends(UserInteractionInstrumentation, _super);
+    function UserInteractionInstrumentation(config) {
+        var _a;
+        var _this = _super.call(this, "@opentelemetry/instrumentation-user-interaction", (0, _version.VERSION), config) || this;
+        _this.version = (0, _version.VERSION);
+        _this.moduleName = "user-interaction";
+        _this._spansData = new WeakMap();
+        // for addEventListener/removeEventListener state
+        _this._wrappedListeners = new WeakMap();
+        // for event bubbling
+        _this._eventsSpanMap = new WeakMap();
+        _this._eventNames = new Set((_a = config === null || config === void 0 ? void 0 : config.eventNames) !== null && _a !== void 0 ? _a : DEFAULT_EVENT_NAMES);
+        _this._shouldPreventSpanCreation = typeof (config === null || config === void 0 ? void 0 : config.shouldPreventSpanCreation) === "function" ? config.shouldPreventSpanCreation : defaultShouldPreventSpanCreation;
+        return _this;
+    }
+    UserInteractionInstrumentation.prototype.init = function() {};
+    /**
+     * This will check if last task was timeout and will save the time to
+     * fix the user interaction when nothing happens
+     * This timeout comes from xhr plugin which is needed to collect information
+     * about last xhr main request from observer
+     * @param task
+     * @param span
+     */ UserInteractionInstrumentation.prototype._checkForTimeout = function(task, span) {
+        var spanData = this._spansData.get(span);
+        if (spanData) {
+            if (task.source === "setTimeout") spanData.hrTimeLastTimeout = (0, _core.hrTime)();
+            else if (task.source !== "Promise.then" && task.source !== "setTimeout") spanData.hrTimeLastTimeout = undefined;
+        }
+    };
+    /**
+     * Controls whether or not to create a span, based on the event type.
+     */ UserInteractionInstrumentation.prototype._allowEventName = function(eventName) {
+        return this._eventNames.has(eventName);
+    };
+    /**
+     * Creates a new span
+     * @param element
+     * @param eventName
+     * @param parentSpan
+     */ UserInteractionInstrumentation.prototype._createSpan = function(element, eventName, parentSpan) {
+        var _a;
+        if (!(element instanceof HTMLElement)) return undefined;
+        if (!element.getAttribute) return undefined;
+        if (element.hasAttribute("disabled")) return undefined;
+        if (!this._allowEventName(eventName)) return undefined;
+        var xpath = (0, _sdkTraceWeb.getElementXPath)(element, true);
+        try {
+            var span = this.tracer.startSpan(eventName, {
+                attributes: (_a = {}, _a[(0, _attributeNames.AttributeNames).EVENT_TYPE] = eventName, _a[(0, _attributeNames.AttributeNames).TARGET_ELEMENT] = element.tagName, _a[(0, _attributeNames.AttributeNames).TARGET_XPATH] = xpath, _a[(0, _attributeNames.AttributeNames).HTTP_URL] = window.location.href, _a)
+            }, parentSpan ? _api.trace.setSpan(_api.context.active(), parentSpan) : undefined);
+            if (this._shouldPreventSpanCreation(eventName, element, span) === true) return undefined;
+            this._spansData.set(span, {
+                taskCount: 0
+            });
+            return span;
+        } catch (e) {
+            this._diag.error("failed to start create new user interaction span", e);
+        }
+        return undefined;
+    };
+    /**
+     * Decrement number of tasks that left in zone,
+     * This is needed to be able to end span when no more tasks left
+     * @param span
+     */ UserInteractionInstrumentation.prototype._decrementTask = function(span) {
+        var spanData = this._spansData.get(span);
+        if (spanData) {
+            spanData.taskCount--;
+            if (spanData.taskCount === 0) this._tryToEndSpan(span, spanData.hrTimeLastTimeout);
+        }
+    };
+    /**
+     * Return the current span
+     * @param zone
+     * @private
+     */ UserInteractionInstrumentation.prototype._getCurrentSpan = function(zone) {
+        var context = zone.get(ZONE_CONTEXT_KEY);
+        if (context) return _api.trace.getSpan(context);
+        return context;
+    };
+    /**
+     * Increment number of tasks that are run within the same zone.
+     *     This is needed to be able to end span when no more tasks left
+     * @param span
+     */ UserInteractionInstrumentation.prototype._incrementTask = function(span) {
+        var spanData = this._spansData.get(span);
+        if (spanData) spanData.taskCount++;
+    };
+    /**
+     * Returns true iff we should use the patched callback; false if it's already been patched
+     */ UserInteractionInstrumentation.prototype.addPatchedListener = function(on, type, listener, wrappedListener) {
+        var listener2Type = this._wrappedListeners.get(listener);
+        if (!listener2Type) {
+            listener2Type = new Map();
+            this._wrappedListeners.set(listener, listener2Type);
+        }
+        var element2patched = listener2Type.get(type);
+        if (!element2patched) {
+            element2patched = new Map();
+            listener2Type.set(type, element2patched);
+        }
+        if (element2patched.has(on)) return false;
+        element2patched.set(on, wrappedListener);
+        return true;
+    };
+    /**
+     * Returns the patched version of the callback (or undefined)
+     */ UserInteractionInstrumentation.prototype.removePatchedListener = function(on, type, listener) {
+        var listener2Type = this._wrappedListeners.get(listener);
+        if (!listener2Type) return undefined;
+        var element2patched = listener2Type.get(type);
+        if (!element2patched) return undefined;
+        var patched = element2patched.get(on);
+        if (patched) {
+            element2patched.delete(on);
+            if (element2patched.size === 0) {
+                listener2Type.delete(type);
+                if (listener2Type.size === 0) this._wrappedListeners.delete(listener);
+            }
+        }
+        return patched;
+    };
+    // utility method to deal with the Function|EventListener nature of addEventListener
+    UserInteractionInstrumentation.prototype._invokeListener = function(listener, target, args) {
+        if (typeof listener === "function") return listener.apply(target, args);
+        else return listener.handleEvent(args[0]);
+    };
+    /**
+     * This patches the addEventListener of HTMLElement to be able to
+     * auto instrument the click events
+     * This is done when zone is not available
+     */ UserInteractionInstrumentation.prototype._patchAddEventListener = function() {
+        var plugin = this;
+        return function(original) {
+            return function addEventListenerPatched(type, listener, useCapture) {
+                // Forward calls with listener = null
+                if (!listener) return original.call(this, type, listener, useCapture);
+                // filter out null (typeof null === 'object')
+                var once = useCapture && typeof useCapture === "object" && useCapture.once;
+                var patchedListener = function() {
+                    var _this = this;
+                    var args = [];
+                    for(var _i = 0; _i < arguments.length; _i++)args[_i] = arguments[_i];
+                    var parentSpan;
+                    var event = args[0];
+                    var target = event === null || event === void 0 ? void 0 : event.target;
+                    if (event) parentSpan = plugin._eventsSpanMap.get(event);
+                    if (once) plugin.removePatchedListener(this, type, listener);
+                    var span = plugin._createSpan(target, type, parentSpan);
+                    if (span) {
+                        if (event) plugin._eventsSpanMap.set(event, span);
+                        return _api.context.with(_api.trace.setSpan(_api.context.active(), span), function() {
+                            var result = plugin._invokeListener(listener, _this, args);
+                            // no zone so end span immediately
+                            span.end();
+                            return result;
+                        });
+                    } else return plugin._invokeListener(listener, this, args);
+                };
+                if (plugin.addPatchedListener(this, type, listener, patchedListener)) return original.call(this, type, patchedListener, useCapture);
+            };
+        };
+    };
+    /**
+     * This patches the removeEventListener of HTMLElement to handle the fact that
+     * we patched the original callbacks
+     * This is done when zone is not available
+     */ UserInteractionInstrumentation.prototype._patchRemoveEventListener = function() {
+        var plugin = this;
+        return function(original) {
+            return function removeEventListenerPatched(type, listener, useCapture) {
+                var wrappedListener = plugin.removePatchedListener(this, type, listener);
+                if (wrappedListener) return original.call(this, type, wrappedListener, useCapture);
+                else return original.call(this, type, listener, useCapture);
+            };
+        };
+    };
+    /**
+     * Most browser provide event listener api via EventTarget in prototype chain.
+     * Exception to this is IE 11 which has it on the prototypes closest to EventTarget:
+     *
+     * * - has addEventListener in IE
+     * ** - has addEventListener in all other browsers
+     * ! - missing in IE
+     *
+     * HTMLElement -> Element -> Node * -> EventTarget **! -> Object
+     * Document -> Node * -> EventTarget **! -> Object
+     * Window * -> WindowProperties ! -> EventTarget **! -> Object
+     */ UserInteractionInstrumentation.prototype._getPatchableEventTargets = function() {
+        return window.EventTarget ? [
+            EventTarget.prototype
+        ] : [
+            Node.prototype,
+            Window.prototype
+        ];
+    };
+    /**
+     * Patches the history api
+     */ UserInteractionInstrumentation.prototype._patchHistoryApi = function() {
+        this._unpatchHistoryApi();
+        this._wrap(history, "replaceState", this._patchHistoryMethod());
+        this._wrap(history, "pushState", this._patchHistoryMethod());
+        this._wrap(history, "back", this._patchHistoryMethod());
+        this._wrap(history, "forward", this._patchHistoryMethod());
+        this._wrap(history, "go", this._patchHistoryMethod());
+    };
+    /**
+     * Patches the certain history api method
+     */ UserInteractionInstrumentation.prototype._patchHistoryMethod = function() {
+        var plugin = this;
+        return function(original) {
+            return function patchHistoryMethod() {
+                var args = [];
+                for(var _i = 0; _i < arguments.length; _i++)args[_i] = arguments[_i];
+                var url = "" + location.pathname + location.hash + location.search;
+                var result = original.apply(this, args);
+                var urlAfter = "" + location.pathname + location.hash + location.search;
+                if (url !== urlAfter) plugin._updateInteractionName(urlAfter);
+                return result;
+            };
+        };
+    };
+    /**
+     * unpatch the history api methods
+     */ UserInteractionInstrumentation.prototype._unpatchHistoryApi = function() {
+        if ((0, _instrumentation.isWrapped)(history.replaceState)) this._unwrap(history, "replaceState");
+        if ((0, _instrumentation.isWrapped)(history.pushState)) this._unwrap(history, "pushState");
+        if ((0, _instrumentation.isWrapped)(history.back)) this._unwrap(history, "back");
+        if ((0, _instrumentation.isWrapped)(history.forward)) this._unwrap(history, "forward");
+        if ((0, _instrumentation.isWrapped)(history.go)) this._unwrap(history, "go");
+    };
+    /**
+     * Updates interaction span name
+     * @param url
+     */ UserInteractionInstrumentation.prototype._updateInteractionName = function(url) {
+        var span = _api.trace.getSpan(_api.context.active());
+        if (span && typeof span.updateName === "function") span.updateName(EVENT_NAVIGATION_NAME + " " + url);
+    };
+    /**
+     * Patches zone cancel task - this is done to be able to correctly
+     * decrement the number of remaining tasks
+     */ UserInteractionInstrumentation.prototype._patchZoneCancelTask = function() {
+        var plugin = this;
+        return function(original) {
+            return function patchCancelTask(task) {
+                var currentZone = Zone.current;
+                var currentSpan = plugin._getCurrentSpan(currentZone);
+                if (currentSpan && plugin._shouldCountTask(task, currentZone)) plugin._decrementTask(currentSpan);
+                return original.call(this, task);
+            };
+        };
+    };
+    /**
+     * Patches zone schedule task - this is done to be able to correctly
+     * increment the number of tasks running within current zone but also to
+     * save time in case of timeout running from xhr plugin when waiting for
+     * main request from PerformanceResourceTiming
+     */ UserInteractionInstrumentation.prototype._patchZoneScheduleTask = function() {
+        var plugin = this;
+        return function(original) {
+            return function patchScheduleTask(task) {
+                var currentZone = Zone.current;
+                var currentSpan = plugin._getCurrentSpan(currentZone);
+                if (currentSpan && plugin._shouldCountTask(task, currentZone)) {
+                    plugin._incrementTask(currentSpan);
+                    plugin._checkForTimeout(task, currentSpan);
+                }
+                return original.call(this, task);
+            };
+        };
+    };
+    /**
+     * Patches zone run task - this is done to be able to create a span when
+     * user interaction starts
+     * @private
+     */ UserInteractionInstrumentation.prototype._patchZoneRunTask = function() {
+        var plugin = this;
+        return function(original) {
+            return function patchRunTask(task, applyThis, applyArgs) {
+                var event = Array.isArray(applyArgs) && applyArgs[0] instanceof Event ? applyArgs[0] : undefined;
+                var target = event === null || event === void 0 ? void 0 : event.target;
+                var span;
+                var activeZone = this;
+                if (target) {
+                    span = plugin._createSpan(target, task.eventName);
+                    if (span) {
+                        plugin._incrementTask(span);
+                        return activeZone.run(function() {
+                            try {
+                                return _api.context.with(_api.trace.setSpan(_api.context.active(), span), function() {
+                                    var currentZone = Zone.current;
+                                    task._zone = currentZone;
+                                    return original.call(currentZone, task, applyThis, applyArgs);
+                                });
+                            } finally{
+                                plugin._decrementTask(span);
+                            }
+                        });
+                    }
+                } else span = plugin._getCurrentSpan(activeZone);
+                try {
+                    return original.call(activeZone, task, applyThis, applyArgs);
+                } finally{
+                    if (span && plugin._shouldCountTask(task, activeZone)) plugin._decrementTask(span);
+                }
+            };
+        };
+    };
+    /**
+     * Decides if task should be counted.
+     * @param task
+     * @param currentZone
+     * @private
+     */ UserInteractionInstrumentation.prototype._shouldCountTask = function(task, currentZone) {
+        if (task._zone) currentZone = task._zone;
+        if (!currentZone || !task.data || task.data.isPeriodic) return false;
+        var currentSpan = this._getCurrentSpan(currentZone);
+        if (!currentSpan) return false;
+        if (!this._spansData.get(currentSpan)) return false;
+        return task.type === "macroTask" || task.type === "microTask";
+    };
+    /**
+     * Will try to end span when such span still exists.
+     * @param span
+     * @param endTime
+     * @private
+     */ UserInteractionInstrumentation.prototype._tryToEndSpan = function(span, endTime) {
+        if (span) {
+            var spanData = this._spansData.get(span);
+            if (spanData) {
+                span.end(endTime);
+                this._spansData.delete(span);
+            }
+        }
+    };
+    /**
+     * implements enable function
+     */ UserInteractionInstrumentation.prototype.enable = function() {
+        var _this = this;
+        var ZoneWithPrototype = this.getZoneWithPrototype();
+        this._diag.debug("applying patch to", this.moduleName, this.version, "zone:", !!ZoneWithPrototype);
+        if (ZoneWithPrototype) {
+            if ((0, _instrumentation.isWrapped)(ZoneWithPrototype.prototype.runTask)) {
+                this._unwrap(ZoneWithPrototype.prototype, "runTask");
+                this._diag.debug("removing previous patch from method runTask");
+            }
+            if ((0, _instrumentation.isWrapped)(ZoneWithPrototype.prototype.scheduleTask)) {
+                this._unwrap(ZoneWithPrototype.prototype, "scheduleTask");
+                this._diag.debug("removing previous patch from method scheduleTask");
+            }
+            if ((0, _instrumentation.isWrapped)(ZoneWithPrototype.prototype.cancelTask)) {
+                this._unwrap(ZoneWithPrototype.prototype, "cancelTask");
+                this._diag.debug("removing previous patch from method cancelTask");
+            }
+            this._zonePatched = true;
+            this._wrap(ZoneWithPrototype.prototype, "runTask", this._patchZoneRunTask());
+            this._wrap(ZoneWithPrototype.prototype, "scheduleTask", this._patchZoneScheduleTask());
+            this._wrap(ZoneWithPrototype.prototype, "cancelTask", this._patchZoneCancelTask());
+        } else {
+            this._zonePatched = false;
+            var targets = this._getPatchableEventTargets();
+            targets.forEach(function(target) {
+                if ((0, _instrumentation.isWrapped)(target.addEventListener)) {
+                    _this._unwrap(target, "addEventListener");
+                    _this._diag.debug("removing previous patch from method addEventListener");
+                }
+                if ((0, _instrumentation.isWrapped)(target.removeEventListener)) {
+                    _this._unwrap(target, "removeEventListener");
+                    _this._diag.debug("removing previous patch from method removeEventListener");
+                }
+                _this._wrap(target, "addEventListener", _this._patchAddEventListener());
+                _this._wrap(target, "removeEventListener", _this._patchRemoveEventListener());
+            });
+        }
+        this._patchHistoryApi();
+    };
+    /**
+     * implements unpatch function
+     */ UserInteractionInstrumentation.prototype.disable = function() {
+        var _this = this;
+        var ZoneWithPrototype = this.getZoneWithPrototype();
+        this._diag.debug("removing patch from", this.moduleName, this.version, "zone:", !!ZoneWithPrototype);
+        if (ZoneWithPrototype && this._zonePatched) {
+            if ((0, _instrumentation.isWrapped)(ZoneWithPrototype.prototype.runTask)) this._unwrap(ZoneWithPrototype.prototype, "runTask");
+            if ((0, _instrumentation.isWrapped)(ZoneWithPrototype.prototype.scheduleTask)) this._unwrap(ZoneWithPrototype.prototype, "scheduleTask");
+            if ((0, _instrumentation.isWrapped)(ZoneWithPrototype.prototype.cancelTask)) this._unwrap(ZoneWithPrototype.prototype, "cancelTask");
+        } else {
+            var targets = this._getPatchableEventTargets();
+            targets.forEach(function(target) {
+                if ((0, _instrumentation.isWrapped)(target.addEventListener)) _this._unwrap(target, "addEventListener");
+                if ((0, _instrumentation.isWrapped)(target.removeEventListener)) _this._unwrap(target, "removeEventListener");
+            });
+        }
+        this._unpatchHistoryApi();
+    };
+    /**
+     * returns Zone
+     */ UserInteractionInstrumentation.prototype.getZoneWithPrototype = function() {
+        var _window = window;
+        return _window.Zone;
+    };
+    return UserInteractionInstrumentation;
+}((0, _instrumentation.InstrumentationBase));
+
+},{"@opentelemetry/instrumentation":"3OTpd","@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","@opentelemetry/sdk-trace-web":"eXZZL","./enums/AttributeNames":"50VYj","./version":"6PVqs","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"50VYj":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "AttributeNames", ()=>AttributeNames);
+var AttributeNames;
+(function(AttributeNames) {
+    AttributeNames["EVENT_TYPE"] = "event_type";
+    AttributeNames["TARGET_ELEMENT"] = "target_element";
+    AttributeNames["TARGET_XPATH"] = "target_xpath";
+    AttributeNames["HTTP_URL"] = "http.url";
+})(AttributeNames || (AttributeNames = {}));
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"6PVqs":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ // this is autogenerated file, see scripts/version-update.js
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "VERSION", ()=>VERSION);
+var VERSION = "0.37.0";
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"jYPe9":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _xhr = require("./xhr");
+parcelHelpers.exportAll(_xhr, exports);
+
+},{"./xhr":"3C1i1","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"3C1i1":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "XMLHttpRequestInstrumentation", ()=>XMLHttpRequestInstrumentation);
+var _api = require("@opentelemetry/api");
+var _instrumentation = require("@opentelemetry/instrumentation");
+var _core = require("@opentelemetry/core");
+var _semanticConventions = require("@opentelemetry/semantic-conventions");
+var _sdkTraceWeb = require("@opentelemetry/sdk-trace-web");
+var _eventNames = require("./enums/EventNames");
+var _version = require("./version");
+var _attributeNames = require("./enums/AttributeNames");
+var __extends = undefined && undefined.__extends || function() {
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || ({
+            __proto__: []
+        }) instanceof Array && function(d, b) {
+            d.__proto__ = b;
+        } || function(d, b) {
+            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+        };
+        return extendStatics(d, b);
+    };
+    return function(d, b) {
+        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() {
+            this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+}();
+// how long to wait for observer to collect information about resources
+// this is needed as event "load" is called before observer
+// hard to say how long it should really wait, seems like 300ms is
+// safe enough
+var OBSERVER_WAIT_TIME_MS = 300;
+/**
+ * This class represents a XMLHttpRequest plugin for auto instrumentation
+ */ var XMLHttpRequestInstrumentation = /** @class */ function(_super) {
+    __extends(XMLHttpRequestInstrumentation, _super);
+    function XMLHttpRequestInstrumentation(config) {
+        var _this = _super.call(this, "@opentelemetry/instrumentation-xml-http-request", (0, _version.VERSION), config) || this;
+        _this.component = "xml-http-request";
+        _this.version = (0, _version.VERSION);
+        _this.moduleName = _this.component;
+        _this._tasksCount = 0;
+        _this._xhrMem = new WeakMap();
+        _this._usedResources = new WeakSet();
+        return _this;
+    }
+    XMLHttpRequestInstrumentation.prototype.init = function() {};
+    XMLHttpRequestInstrumentation.prototype._getConfig = function() {
+        return this._config;
+    };
+    /**
+     * Adds custom headers to XMLHttpRequest
+     * @param xhr
+     * @param spanUrl
+     * @private
+     */ XMLHttpRequestInstrumentation.prototype._addHeaders = function(xhr, spanUrl) {
+        var url = (0, _sdkTraceWeb.parseUrl)(spanUrl).href;
+        if (!(0, _sdkTraceWeb.shouldPropagateTraceHeaders)(url, this._getConfig().propagateTraceHeaderCorsUrls)) {
+            var headers_1 = {};
+            _api.propagation.inject(_api.context.active(), headers_1);
+            if (Object.keys(headers_1).length > 0) this._diag.debug("headers inject skipped due to CORS policy");
+            return;
+        }
+        var headers = {};
+        _api.propagation.inject(_api.context.active(), headers);
+        Object.keys(headers).forEach(function(key) {
+            xhr.setRequestHeader(key, String(headers[key]));
+        });
+    };
+    /**
+     * Add cors pre flight child span
+     * @param span
+     * @param corsPreFlightRequest
+     * @private
+     */ XMLHttpRequestInstrumentation.prototype._addChildSpan = function(span, corsPreFlightRequest) {
+        var _this = this;
+        _api.context.with(_api.trace.setSpan(_api.context.active(), span), function() {
+            var childSpan = _this.tracer.startSpan("CORS Preflight", {
+                startTime: corsPreFlightRequest[(0, _sdkTraceWeb.PerformanceTimingNames).FETCH_START]
+            });
+            if (!_this._getConfig().ignoreNetworkEvents) (0, _sdkTraceWeb.addSpanNetworkEvents)(childSpan, corsPreFlightRequest);
+            childSpan.end(corsPreFlightRequest[(0, _sdkTraceWeb.PerformanceTimingNames).RESPONSE_END]);
+        });
+    };
+    /**
+     * Add attributes when span is going to end
+     * @param span
+     * @param xhr
+     * @param spanUrl
+     * @private
+     */ XMLHttpRequestInstrumentation.prototype._addFinalSpanAttributes = function(span, xhrMem, spanUrl) {
+        if (typeof spanUrl === "string") {
+            var parsedUrl = (0, _sdkTraceWeb.parseUrl)(spanUrl);
+            if (xhrMem.status !== undefined) span.setAttribute((0, _semanticConventions.SemanticAttributes).HTTP_STATUS_CODE, xhrMem.status);
+            if (xhrMem.statusText !== undefined) span.setAttribute((0, _attributeNames.AttributeNames).HTTP_STATUS_TEXT, xhrMem.statusText);
+            span.setAttribute((0, _semanticConventions.SemanticAttributes).HTTP_HOST, parsedUrl.host);
+            span.setAttribute((0, _semanticConventions.SemanticAttributes).HTTP_SCHEME, parsedUrl.protocol.replace(":", ""));
+            // @TODO do we want to collect this or it will be collected earlier once only or
+            //    maybe when parent span is not available ?
+            span.setAttribute((0, _semanticConventions.SemanticAttributes).HTTP_USER_AGENT, navigator.userAgent);
+        }
+    };
+    XMLHttpRequestInstrumentation.prototype._applyAttributesAfterXHR = function(span, xhr) {
+        var _this = this;
+        var applyCustomAttributesOnSpan = this._getConfig().applyCustomAttributesOnSpan;
+        if (typeof applyCustomAttributesOnSpan === "function") (0, _instrumentation.safeExecuteInTheMiddle)(function() {
+            return applyCustomAttributesOnSpan(span, xhr);
+        }, function(error) {
+            if (!error) return;
+            _this._diag.error("applyCustomAttributesOnSpan", error);
+        }, true);
+    };
+    /**
+     * will collect information about all resources created
+     * between "send" and "end" with additional waiting for main resource
+     * @param xhr
+     * @param spanUrl
+     * @private
+     */ XMLHttpRequestInstrumentation.prototype._addResourceObserver = function(xhr, spanUrl) {
+        var xhrMem = this._xhrMem.get(xhr);
+        if (!xhrMem || typeof PerformanceObserver !== "function" || typeof PerformanceResourceTiming !== "function") return;
+        xhrMem.createdResources = {
+            observer: new PerformanceObserver(function(list) {
+                var entries = list.getEntries();
+                var parsedUrl = (0, _sdkTraceWeb.parseUrl)(spanUrl);
+                entries.forEach(function(entry) {
+                    if (entry.initiatorType === "xmlhttprequest" && entry.name === parsedUrl.href) {
+                        if (xhrMem.createdResources) xhrMem.createdResources.entries.push(entry);
+                    }
+                });
+            }),
+            entries: []
+        };
+        xhrMem.createdResources.observer.observe({
+            entryTypes: [
+                "resource"
+            ]
+        });
+    };
+    /**
+     * Clears the resource timings and all resources assigned with spans
+     *     when {@link XMLHttpRequestInstrumentationConfig.clearTimingResources} is
+     *     set to true (default false)
+     * @private
+     */ XMLHttpRequestInstrumentation.prototype._clearResources = function() {
+        if (this._tasksCount === 0 && this._getConfig().clearTimingResources) {
+            (0, _core.otperformance).clearResourceTimings();
+            this._xhrMem = new WeakMap();
+            this._usedResources = new WeakSet();
+        }
+    };
+    /**
+     * Finds appropriate resource and add network events to the span
+     * @param span
+     */ XMLHttpRequestInstrumentation.prototype._findResourceAndAddNetworkEvents = function(xhrMem, span, spanUrl, startTime, endTime) {
+        if (!spanUrl || !startTime || !endTime || !xhrMem.createdResources) return;
+        var resources = xhrMem.createdResources.entries;
+        if (!resources || !resources.length) // fallback - either Observer is not available or it took longer
+        // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
+        // information
+        // ts thinks this is the perf_hooks module, but it is the browser performance api
+        resources = (0, _core.otperformance).getEntriesByType("resource");
+        var resource = (0, _sdkTraceWeb.getResource)((0, _sdkTraceWeb.parseUrl)(spanUrl).href, startTime, endTime, resources, this._usedResources);
+        if (resource.mainRequest) {
+            var mainRequest = resource.mainRequest;
+            this._markResourceAsUsed(mainRequest);
+            var corsPreFlightRequest = resource.corsPreFlightRequest;
+            if (corsPreFlightRequest) {
+                this._addChildSpan(span, corsPreFlightRequest);
+                this._markResourceAsUsed(corsPreFlightRequest);
+            }
+            if (!this._getConfig().ignoreNetworkEvents) (0, _sdkTraceWeb.addSpanNetworkEvents)(span, mainRequest);
+        }
+    };
+    /**
+     * Removes the previous information about span.
+     * This might happened when the same xhr is used again.
+     * @param xhr
+     * @private
+     */ XMLHttpRequestInstrumentation.prototype._cleanPreviousSpanInformation = function(xhr) {
+        var xhrMem = this._xhrMem.get(xhr);
+        if (xhrMem) {
+            var callbackToRemoveEvents = xhrMem.callbackToRemoveEvents;
+            if (callbackToRemoveEvents) callbackToRemoveEvents();
+            this._xhrMem.delete(xhr);
+        }
+    };
+    /**
+     * Creates a new span when method "open" is called
+     * @param xhr
+     * @param url
+     * @param method
+     * @private
+     */ XMLHttpRequestInstrumentation.prototype._createSpan = function(xhr, url, method) {
+        var _a;
+        if ((0, _core.isUrlIgnored)(url, this._getConfig().ignoreUrls)) {
+            this._diag.debug("ignoring span as url matches ignored url");
+            return;
+        }
+        var spanName = method.toUpperCase();
+        var currentSpan = this.tracer.startSpan(spanName, {
+            kind: _api.SpanKind.CLIENT,
+            attributes: (_a = {}, _a[(0, _semanticConventions.SemanticAttributes).HTTP_METHOD] = method, _a[(0, _semanticConventions.SemanticAttributes).HTTP_URL] = (0, _sdkTraceWeb.parseUrl)(url).toString(), _a)
+        });
+        currentSpan.addEvent((0, _eventNames.EventNames).METHOD_OPEN);
+        this._cleanPreviousSpanInformation(xhr);
+        this._xhrMem.set(xhr, {
+            span: currentSpan,
+            spanUrl: url
+        });
+        return currentSpan;
+    };
+    /**
+     * Marks certain [resource]{@link PerformanceResourceTiming} when information
+     * from this is used to add events to span.
+     * This is done to avoid reusing the same resource again for next span
+     * @param resource
+     * @private
+     */ XMLHttpRequestInstrumentation.prototype._markResourceAsUsed = function(resource) {
+        this._usedResources.add(resource);
+    };
+    /**
+     * Patches the method open
+     * @private
+     */ XMLHttpRequestInstrumentation.prototype._patchOpen = function() {
+        var _this = this;
+        return function(original) {
+            var plugin = _this;
+            return function patchOpen() {
+                var args = [];
+                for(var _i = 0; _i < arguments.length; _i++)args[_i] = arguments[_i];
+                var method = args[0];
+                var url = args[1];
+                plugin._createSpan(this, url, method);
+                return original.apply(this, args);
+            };
+        };
+    };
+    /**
+     * Patches the method send
+     * @private
+     */ XMLHttpRequestInstrumentation.prototype._patchSend = function() {
+        var plugin = this;
+        function endSpanTimeout(eventName, xhrMem, performanceEndTime, endTime) {
+            var callbackToRemoveEvents = xhrMem.callbackToRemoveEvents;
+            if (typeof callbackToRemoveEvents === "function") callbackToRemoveEvents();
+            var span = xhrMem.span, spanUrl = xhrMem.spanUrl, sendStartTime = xhrMem.sendStartTime;
+            if (span) {
+                plugin._findResourceAndAddNetworkEvents(xhrMem, span, spanUrl, sendStartTime, performanceEndTime);
+                span.addEvent(eventName, endTime);
+                plugin._addFinalSpanAttributes(span, xhrMem, spanUrl);
+                span.end(endTime);
+                plugin._tasksCount--;
+            }
+            plugin._clearResources();
+        }
+        function endSpan(eventName, xhr) {
+            var xhrMem = plugin._xhrMem.get(xhr);
+            if (!xhrMem) return;
+            xhrMem.status = xhr.status;
+            xhrMem.statusText = xhr.statusText;
+            plugin._xhrMem.delete(xhr);
+            if (xhrMem.span) plugin._applyAttributesAfterXHR(xhrMem.span, xhr);
+            var performanceEndTime = (0, _core.hrTime)();
+            var endTime = Date.now();
+            // the timeout is needed as observer doesn't have yet information
+            // when event "load" is called. Also the time may differ depends on
+            // browser and speed of computer
+            setTimeout(function() {
+                endSpanTimeout(eventName, xhrMem, performanceEndTime, endTime);
+            }, OBSERVER_WAIT_TIME_MS);
+        }
+        function onError() {
+            endSpan((0, _eventNames.EventNames).EVENT_ERROR, this);
+        }
+        function onAbort() {
+            endSpan((0, _eventNames.EventNames).EVENT_ABORT, this);
+        }
+        function onTimeout() {
+            endSpan((0, _eventNames.EventNames).EVENT_TIMEOUT, this);
+        }
+        function onLoad() {
+            if (this.status < 299) endSpan((0, _eventNames.EventNames).EVENT_LOAD, this);
+            else endSpan((0, _eventNames.EventNames).EVENT_ERROR, this);
+        }
+        function unregister(xhr) {
+            xhr.removeEventListener("abort", onAbort);
+            xhr.removeEventListener("error", onError);
+            xhr.removeEventListener("load", onLoad);
+            xhr.removeEventListener("timeout", onTimeout);
+            var xhrMem = plugin._xhrMem.get(xhr);
+            if (xhrMem) xhrMem.callbackToRemoveEvents = undefined;
+        }
+        return function(original) {
+            return function patchSend() {
+                var _this = this;
+                var args = [];
+                for(var _i = 0; _i < arguments.length; _i++)args[_i] = arguments[_i];
+                var xhrMem = plugin._xhrMem.get(this);
+                if (!xhrMem) return original.apply(this, args);
+                var currentSpan = xhrMem.span;
+                var spanUrl = xhrMem.spanUrl;
+                if (currentSpan && spanUrl) _api.context.with(_api.trace.setSpan(_api.context.active(), currentSpan), function() {
+                    plugin._tasksCount++;
+                    xhrMem.sendStartTime = (0, _core.hrTime)();
+                    currentSpan.addEvent((0, _eventNames.EventNames).METHOD_SEND);
+                    _this.addEventListener("abort", onAbort);
+                    _this.addEventListener("error", onError);
+                    _this.addEventListener("load", onLoad);
+                    _this.addEventListener("timeout", onTimeout);
+                    xhrMem.callbackToRemoveEvents = function() {
+                        unregister(_this);
+                        if (xhrMem.createdResources) xhrMem.createdResources.observer.disconnect();
+                    };
+                    plugin._addHeaders(_this, spanUrl);
+                    plugin._addResourceObserver(_this, spanUrl);
+                });
+                return original.apply(this, args);
+            };
+        };
+    };
+    /**
+     * implements enable function
+     */ XMLHttpRequestInstrumentation.prototype.enable = function() {
+        this._diag.debug("applying patch to", this.moduleName, this.version);
+        if ((0, _instrumentation.isWrapped)(XMLHttpRequest.prototype.open)) {
+            this._unwrap(XMLHttpRequest.prototype, "open");
+            this._diag.debug("removing previous patch from method open");
+        }
+        if ((0, _instrumentation.isWrapped)(XMLHttpRequest.prototype.send)) {
+            this._unwrap(XMLHttpRequest.prototype, "send");
+            this._diag.debug("removing previous patch from method send");
+        }
+        this._wrap(XMLHttpRequest.prototype, "open", this._patchOpen());
+        this._wrap(XMLHttpRequest.prototype, "send", this._patchSend());
+    };
+    /**
+     * implements disable function
+     */ XMLHttpRequestInstrumentation.prototype.disable = function() {
+        this._diag.debug("removing patch from", this.moduleName, this.version);
+        this._unwrap(XMLHttpRequest.prototype, "open");
+        this._unwrap(XMLHttpRequest.prototype, "send");
+        this._tasksCount = 0;
+        this._xhrMem = new WeakMap();
+        this._usedResources = new WeakSet();
+    };
+    return XMLHttpRequestInstrumentation;
+}((0, _instrumentation.InstrumentationBase));
+
+},{"@opentelemetry/api":"6AC4z","@opentelemetry/instrumentation":"3OTpd","@opentelemetry/core":"dBsXh","@opentelemetry/semantic-conventions":"lCgfj","@opentelemetry/sdk-trace-web":"eXZZL","./enums/EventNames":"2ideG","./version":"ce7eg","./enums/AttributeNames":"eLfrd","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"2ideG":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "EventNames", ()=>EventNames);
+var EventNames;
+(function(EventNames) {
+    EventNames["METHOD_OPEN"] = "open";
+    EventNames["METHOD_SEND"] = "send";
+    EventNames["EVENT_ABORT"] = "abort";
+    EventNames["EVENT_ERROR"] = "error";
+    EventNames["EVENT_LOAD"] = "loaded";
+    EventNames["EVENT_TIMEOUT"] = "timeout";
+})(EventNames || (EventNames = {}));
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"ce7eg":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ // this is autogenerated file, see scripts/version-update.js
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "VERSION", ()=>VERSION);
+var VERSION = "0.50.0";
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"eLfrd":[function(require,module,exports) {
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ /**
+ * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/http.md
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "AttributeNames", ()=>AttributeNames);
+var AttributeNames;
+(function(AttributeNames) {
+    AttributeNames["HTTP_STATUS_TEXT"] = "http.status_text";
+})(AttributeNames || (AttributeNames = {}));
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"cmUfS":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -10172,7 +13371,7 @@ var _contextZonePeerDep = require("@opentelemetry/context-zone-peer-dep");
 parcelHelpers.exportAll(_contextZonePeerDep, exports);
 var _zoneJs = require("zone.js");
 
-},{"@opentelemetry/context-zone-peer-dep":"lln3o","zone.js":"9REDz","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"lln3o":[function(require,module,exports) {
+},{"@opentelemetry/context-zone-peer-dep":"lln3o","zone.js":"9REDz","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"lln3o":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -10194,7 +13393,7 @@ parcelHelpers.exportAll(_zoneContextManager, exports);
 var _types = require("./types");
 parcelHelpers.exportAll(_types, exports);
 
-},{"./ZoneContextManager":"la9bE","./types":false,"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"la9bE":[function(require,module,exports) {
+},{"./ZoneContextManager":"la9bE","./types":false,"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"la9bE":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -10379,7 +13578,7 @@ var _util = require("./util");
     return ZoneContextManager;
 }();
 
-},{"@opentelemetry/api":"6AC4z","./util":"5r8zZ","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"5r8zZ":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","./util":"5r8zZ","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"5r8zZ":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -10406,7 +13605,7 @@ function isListenerObject(obj) {
     return typeof obj.addEventListener === "function" && typeof obj.removeEventListener === "function";
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"9REDz":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"9REDz":[function(require,module,exports) {
 "use strict";
 /**
  * @license Angular v<unknown>
@@ -12675,2765 +15874,7 @@ Zone.__load_patch("queueMicrotask", (global, Zone1, api)=>{
     patchQueueMicrotask(global, api);
 });
 
-},{}],"3OTpd":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "InstrumentationBase", ()=>(0, _index.InstrumentationBase));
-parcelHelpers.export(exports, "InstrumentationNodeModuleDefinition", ()=>(0, _instrumentationNodeModuleDefinition.InstrumentationNodeModuleDefinition));
-parcelHelpers.export(exports, "InstrumentationNodeModuleFile", ()=>(0, _instrumentationNodeModuleFile.InstrumentationNodeModuleFile));
-var _autoLoader = require("./autoLoader");
-parcelHelpers.exportAll(_autoLoader, exports);
-var _index = require("./platform/index");
-var _instrumentationNodeModuleDefinition = require("./instrumentationNodeModuleDefinition");
-var _instrumentationNodeModuleFile = require("./instrumentationNodeModuleFile");
-var _types = require("./types");
-parcelHelpers.exportAll(_types, exports);
-var _typesInternal = require("./types_internal");
-parcelHelpers.exportAll(_typesInternal, exports);
-var _utils = require("./utils");
-parcelHelpers.exportAll(_utils, exports);
-
-},{"./autoLoader":"4D6OU","./platform/index":"lLPwY","./instrumentationNodeModuleDefinition":false,"./instrumentationNodeModuleFile":false,"./types":false,"./types_internal":false,"./utils":"3YarC","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"4D6OU":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-/**
- * It will register instrumentations and plugins
- * @param options
- * @return returns function to unload instrumentation and plugins that were
- *   registered
- */ parcelHelpers.export(exports, "registerInstrumentations", ()=>registerInstrumentations);
-var _api = require("@opentelemetry/api");
-var _apiLogs = require("@opentelemetry/api-logs");
-var _autoLoaderUtils = require("./autoLoaderUtils");
-function registerInstrumentations(options) {
-    var instrumentations = (0, _autoLoaderUtils.parseInstrumentationOptions)(options.instrumentations).instrumentations;
-    var tracerProvider = options.tracerProvider || (0, _api.trace).getTracerProvider();
-    var meterProvider = options.meterProvider || (0, _api.metrics).getMeterProvider();
-    var loggerProvider = options.loggerProvider || (0, _apiLogs.logs).getLoggerProvider();
-    (0, _autoLoaderUtils.enableInstrumentations)(instrumentations, tracerProvider, meterProvider, loggerProvider);
-    return function() {
-        (0, _autoLoaderUtils.disableInstrumentations)(instrumentations);
-    };
-}
-
-},{"@opentelemetry/api":"6AC4z","@opentelemetry/api-logs":"8PPAH","./autoLoaderUtils":"7OC7p","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"8PPAH":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "logs", ()=>logs);
-var _logger = require("./types/Logger");
-parcelHelpers.exportAll(_logger, exports);
-var _loggerProvider = require("./types/LoggerProvider");
-parcelHelpers.exportAll(_loggerProvider, exports);
-var _logRecord = require("./types/LogRecord");
-parcelHelpers.exportAll(_logRecord, exports);
-var _loggerOptions = require("./types/LoggerOptions");
-parcelHelpers.exportAll(_loggerOptions, exports);
-var _anyValue = require("./types/AnyValue");
-parcelHelpers.exportAll(_anyValue, exports);
-var _noopLogger = require("./NoopLogger");
-parcelHelpers.exportAll(_noopLogger, exports);
-var _noopLoggerProvider = require("./NoopLoggerProvider");
-parcelHelpers.exportAll(_noopLoggerProvider, exports);
-var _logs = require("./api/logs");
-var logs = (0, _logs.LogsAPI).getInstance();
-
-},{"./types/Logger":false,"./types/LoggerProvider":false,"./types/LogRecord":false,"./types/LoggerOptions":false,"./types/AnyValue":false,"./NoopLogger":false,"./NoopLoggerProvider":false,"./api/logs":"bJuoF","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"3wEsI":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "NoopLogger", ()=>NoopLogger);
-parcelHelpers.export(exports, "NOOP_LOGGER", ()=>NOOP_LOGGER);
-var NoopLogger = /** @class */ function() {
-    function NoopLogger() {}
-    NoopLogger.prototype.emit = function(_logRecord) {};
-    return NoopLogger;
-}();
-var NOOP_LOGGER = new NoopLogger();
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"d2o09":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "NoopLoggerProvider", ()=>NoopLoggerProvider);
-parcelHelpers.export(exports, "NOOP_LOGGER_PROVIDER", ()=>NOOP_LOGGER_PROVIDER);
-var _noopLogger = require("./NoopLogger");
-var NoopLoggerProvider = /** @class */ function() {
-    function NoopLoggerProvider() {}
-    NoopLoggerProvider.prototype.getLogger = function(_name, _version, _options) {
-        return new (0, _noopLogger.NoopLogger)();
-    };
-    return NoopLoggerProvider;
-}();
-var NOOP_LOGGER_PROVIDER = new NoopLoggerProvider();
-
-},{"./NoopLogger":"3wEsI","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"bJuoF":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "LogsAPI", ()=>LogsAPI);
-var _globalUtils = require("../internal/global-utils");
-var _noopLoggerProvider = require("../NoopLoggerProvider");
-var LogsAPI = /** @class */ function() {
-    function LogsAPI() {}
-    LogsAPI.getInstance = function() {
-        if (!this._instance) this._instance = new LogsAPI();
-        return this._instance;
-    };
-    LogsAPI.prototype.setGlobalLoggerProvider = function(provider) {
-        if ((0, _globalUtils._global)[0, _globalUtils.GLOBAL_LOGS_API_KEY]) return this.getLoggerProvider();
-        (0, _globalUtils._global)[0, _globalUtils.GLOBAL_LOGS_API_KEY] = (0, _globalUtils.makeGetter)((0, _globalUtils.API_BACKWARDS_COMPATIBILITY_VERSION), provider, (0, _noopLoggerProvider.NOOP_LOGGER_PROVIDER));
-        return provider;
-    };
-    /**
-     * Returns the global logger provider.
-     *
-     * @returns LoggerProvider
-     */ LogsAPI.prototype.getLoggerProvider = function() {
-        var _a, _b;
-        return (_b = (_a = (0, _globalUtils._global)[0, _globalUtils.GLOBAL_LOGS_API_KEY]) === null || _a === void 0 ? void 0 : _a.call((0, _globalUtils._global), (0, _globalUtils.API_BACKWARDS_COMPATIBILITY_VERSION))) !== null && _b !== void 0 ? _b : (0, _noopLoggerProvider.NOOP_LOGGER_PROVIDER);
-    };
-    /**
-     * Returns a logger from the global logger provider.
-     *
-     * @returns Logger
-     */ LogsAPI.prototype.getLogger = function(name, version, options) {
-        return this.getLoggerProvider().getLogger(name, version, options);
-    };
-    /** Remove the global logger provider */ LogsAPI.prototype.disable = function() {
-        delete (0, _globalUtils._global)[0, _globalUtils.GLOBAL_LOGS_API_KEY];
-    };
-    return LogsAPI;
-}();
-
-},{"../internal/global-utils":"glyIT","../NoopLoggerProvider":"d2o09","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"glyIT":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "GLOBAL_LOGS_API_KEY", ()=>GLOBAL_LOGS_API_KEY);
-parcelHelpers.export(exports, "_global", ()=>_global);
-/**
- * Make a function which accepts a version integer and returns the instance of an API if the version
- * is compatible, or a fallback version (usually NOOP) if it is not.
- *
- * @param requiredVersion Backwards compatibility version which is required to return the instance
- * @param instance Instance which should be returned if the required version is compatible
- * @param fallback Fallback instance, usually NOOP, which will be returned if the required version is not compatible
- */ parcelHelpers.export(exports, "makeGetter", ()=>makeGetter);
-parcelHelpers.export(exports, "API_BACKWARDS_COMPATIBILITY_VERSION", ()=>API_BACKWARDS_COMPATIBILITY_VERSION);
-var _platform = require("../platform");
-var GLOBAL_LOGS_API_KEY = Symbol.for("io.opentelemetry.js.api.logs");
-var _global = (0, _platform._globalThis);
-function makeGetter(requiredVersion, instance, fallback) {
-    return function(version) {
-        return version === requiredVersion ? instance : fallback;
-    };
-}
-var API_BACKWARDS_COMPATIBILITY_VERSION = 1;
-
-},{"../platform":"cicGq","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"cicGq":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _globalThis = require("./globalThis");
-parcelHelpers.exportAll(_globalThis, exports);
-
-},{"./globalThis":"7NLgd","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"7NLgd":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ // Updates to this file should also be replicated to @opentelemetry/api and
-// @opentelemetry/core too.
-/**
- * - globalThis (New standard)
- * - self (Will return the current window instance for supported browsers)
- * - window (fallback for older browser implementations)
- * - global (NodeJS implementation)
- * - <object> (When all else fails)
- */ /** only globals that common to node and browsers are allowed */ // eslint-disable-next-line node/no-unsupported-features/es-builtins, no-undef
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "_globalThis", ()=>_globalThis);
-var global = arguments[3];
-var _globalThis = typeof globalThis === "object" ? globalThis : typeof self === "object" ? self : typeof window === "object" ? window : typeof global === "object" ? global : {};
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"7OC7p":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ /**
- * Parses the options and returns instrumentations, node plugins and
- *   web plugins
- * @param options
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "parseInstrumentationOptions", ()=>parseInstrumentationOptions);
-/**
- * Enable instrumentations
- * @param instrumentations
- * @param tracerProvider
- * @param meterProvider
- */ parcelHelpers.export(exports, "enableInstrumentations", ()=>enableInstrumentations);
-/**
- * Disable instrumentations
- * @param instrumentations
- */ parcelHelpers.export(exports, "disableInstrumentations", ()=>disableInstrumentations);
-function parseInstrumentationOptions(options) {
-    if (options === void 0) options = [];
-    var instrumentations = [];
-    for(var i = 0, j = options.length; i < j; i++){
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        var option = options[i];
-        if (Array.isArray(option)) {
-            var results = parseInstrumentationOptions(option);
-            instrumentations = instrumentations.concat(results.instrumentations);
-        } else if (typeof option === "function") instrumentations.push(new option());
-        else if (option.instrumentationName) instrumentations.push(option);
-    }
-    return {
-        instrumentations: instrumentations
-    };
-}
-function enableInstrumentations(instrumentations, tracerProvider, meterProvider, loggerProvider) {
-    for(var i = 0, j = instrumentations.length; i < j; i++){
-        var instrumentation = instrumentations[i];
-        if (tracerProvider) instrumentation.setTracerProvider(tracerProvider);
-        if (meterProvider) instrumentation.setMeterProvider(meterProvider);
-        if (loggerProvider && instrumentation.setLoggerProvider) instrumentation.setLoggerProvider(loggerProvider);
-        // instrumentations have been already enabled during creation
-        // so enable only if user prevented that by setting enabled to false
-        // this is to prevent double enabling but when calling register all
-        // instrumentations should be now enabled
-        if (!instrumentation.getConfig().enabled) instrumentation.enable();
-    }
-}
-function disableInstrumentations(instrumentations) {
-    instrumentations.forEach(function(instrumentation) {
-        return instrumentation.disable();
-    });
-}
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"lLPwY":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "InstrumentationBase", ()=>(0, _instrumentation.InstrumentationBase));
-parcelHelpers.export(exports, "normalize", ()=>(0, _noopNormalize.normalize));
-var _instrumentation = require("./instrumentation");
-var _noopNormalize = require("./noop-normalize");
-
-},{"./instrumentation":"hCn2q","./noop-normalize":false,"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"hCn2q":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "InstrumentationBase", ()=>InstrumentationBase);
-var _instrumentation = require("../../instrumentation");
-var __extends = undefined && undefined.__extends || function() {
-    var extendStatics = function(d, b) {
-        extendStatics = Object.setPrototypeOf || ({
-            __proto__: []
-        }) instanceof Array && function(d, b) {
-            d.__proto__ = b;
-        } || function(d, b) {
-            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
-        };
-        return extendStatics(d, b);
-    };
-    return function(d, b) {
-        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() {
-            this.constructor = d;
-        }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-}();
-/**
- * Base abstract class for instrumenting web plugins
- */ var InstrumentationBase = /** @class */ function(_super) {
-    __extends(InstrumentationBase, _super);
-    function InstrumentationBase(instrumentationName, instrumentationVersion, config) {
-        if (config === void 0) config = {};
-        var _this = _super.call(this, instrumentationName, instrumentationVersion, config) || this;
-        if (_this._config.enabled) _this.enable();
-        return _this;
-    }
-    return InstrumentationBase;
-}((0, _instrumentation.InstrumentationAbstract));
-
-},{"../../instrumentation":"jMsGo","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"jMsGo":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "InstrumentationAbstract", ()=>InstrumentationAbstract);
-var _api = require("@opentelemetry/api");
-var _apiLogs = require("@opentelemetry/api-logs");
-var _shimmer = require("shimmer");
-var __assign = undefined && undefined.__assign || function() {
-    __assign = Object.assign || function(t) {
-        for(var s, i = 1, n = arguments.length; i < n; i++){
-            s = arguments[i];
-            for(var p in s)if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-/**
- * Base abstract internal class for instrumenting node and web plugins
- */ var InstrumentationAbstract = /** @class */ function() {
-    function InstrumentationAbstract(instrumentationName, instrumentationVersion, config) {
-        if (config === void 0) config = {};
-        this.instrumentationName = instrumentationName;
-        this.instrumentationVersion = instrumentationVersion;
-        /* Api to wrap instrumented method */ this._wrap = _shimmer.wrap;
-        /* Api to unwrap instrumented methods */ this._unwrap = _shimmer.unwrap;
-        /* Api to mass wrap instrumented method */ this._massWrap = _shimmer.massWrap;
-        /* Api to mass unwrap instrumented methods */ this._massUnwrap = _shimmer.massUnwrap;
-        this._config = __assign({
-            enabled: true
-        }, config);
-        this._diag = (0, _api.diag).createComponentLogger({
-            namespace: instrumentationName
-        });
-        this._tracer = (0, _api.trace).getTracer(instrumentationName, instrumentationVersion);
-        this._meter = (0, _api.metrics).getMeter(instrumentationName, instrumentationVersion);
-        this._logger = (0, _apiLogs.logs).getLogger(instrumentationName, instrumentationVersion);
-        this._updateMetricInstruments();
-    }
-    Object.defineProperty(InstrumentationAbstract.prototype, "meter", {
-        /* Returns meter */ get: function() {
-            return this._meter;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    /**
-     * Sets MeterProvider to this plugin
-     * @param meterProvider
-     */ InstrumentationAbstract.prototype.setMeterProvider = function(meterProvider) {
-        this._meter = meterProvider.getMeter(this.instrumentationName, this.instrumentationVersion);
-        this._updateMetricInstruments();
-    };
-    Object.defineProperty(InstrumentationAbstract.prototype, "logger", {
-        /* Returns logger */ get: function() {
-            return this._logger;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    /**
-     * Sets LoggerProvider to this plugin
-     * @param loggerProvider
-     */ InstrumentationAbstract.prototype.setLoggerProvider = function(loggerProvider) {
-        this._logger = loggerProvider.getLogger(this.instrumentationName, this.instrumentationVersion);
-    };
-    /**
-     * @experimental
-     *
-     * Get module definitions defined by {@link init}.
-     * This can be used for experimental compile-time instrumentation.
-     *
-     * @returns an array of {@link InstrumentationModuleDefinition}
-     */ InstrumentationAbstract.prototype.getModuleDefinitions = function() {
-        var _a;
-        var initResult = (_a = this.init()) !== null && _a !== void 0 ? _a : [];
-        if (!Array.isArray(initResult)) return [
-            initResult
-        ];
-        return initResult;
-    };
-    /**
-     * Sets the new metric instruments with the current Meter.
-     */ InstrumentationAbstract.prototype._updateMetricInstruments = function() {
-        return;
-    };
-    /* Returns InstrumentationConfig */ InstrumentationAbstract.prototype.getConfig = function() {
-        return this._config;
-    };
-    /**
-     * Sets InstrumentationConfig to this plugin
-     * @param InstrumentationConfig
-     */ InstrumentationAbstract.prototype.setConfig = function(config) {
-        if (config === void 0) config = {};
-        this._config = Object.assign({}, config);
-    };
-    /**
-     * Sets TraceProvider to this plugin
-     * @param tracerProvider
-     */ InstrumentationAbstract.prototype.setTracerProvider = function(tracerProvider) {
-        this._tracer = tracerProvider.getTracer(this.instrumentationName, this.instrumentationVersion);
-    };
-    Object.defineProperty(InstrumentationAbstract.prototype, "tracer", {
-        /* Returns tracer */ get: function() {
-            return this._tracer;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    return InstrumentationAbstract;
-}();
-
-},{"@opentelemetry/api":"6AC4z","@opentelemetry/api-logs":"8PPAH","shimmer":"kGpxk","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"kGpxk":[function(require,module,exports) {
-"use strict";
-function isFunction(funktion) {
-    return typeof funktion === "function";
-}
-// Default to complaining loudly when things don't go according to plan.
-var logger = console.error.bind(console);
-// Sets a property on an object, preserving its enumerability.
-// This function assumes that the property is already writable.
-function defineProperty(obj, name, value) {
-    var enumerable = !!obj[name] && obj.propertyIsEnumerable(name);
-    Object.defineProperty(obj, name, {
-        configurable: true,
-        enumerable: enumerable,
-        writable: true,
-        value: value
-    });
-}
-// Keep initialization idempotent.
-function shimmer(options) {
-    if (options && options.logger) {
-        if (!isFunction(options.logger)) logger("new logger isn't a function, not replacing");
-        else logger = options.logger;
-    }
-}
-function wrap(nodule, name, wrapper) {
-    if (!nodule || !nodule[name]) {
-        logger("no original function " + name + " to wrap");
-        return;
-    }
-    if (!wrapper) {
-        logger("no wrapper function");
-        logger(new Error().stack);
-        return;
-    }
-    if (!isFunction(nodule[name]) || !isFunction(wrapper)) {
-        logger("original object and wrapper must be functions");
-        return;
-    }
-    var original = nodule[name];
-    var wrapped = wrapper(original, name);
-    defineProperty(wrapped, "__original", original);
-    defineProperty(wrapped, "__unwrap", function() {
-        if (nodule[name] === wrapped) defineProperty(nodule, name, original);
-    });
-    defineProperty(wrapped, "__wrapped", true);
-    defineProperty(nodule, name, wrapped);
-    return wrapped;
-}
-function massWrap(nodules, names, wrapper) {
-    if (!nodules) {
-        logger("must provide one or more modules to patch");
-        logger(new Error().stack);
-        return;
-    } else if (!Array.isArray(nodules)) nodules = [
-        nodules
-    ];
-    if (!(names && Array.isArray(names))) {
-        logger("must provide one or more functions to wrap on modules");
-        return;
-    }
-    nodules.forEach(function(nodule) {
-        names.forEach(function(name) {
-            wrap(nodule, name, wrapper);
-        });
-    });
-}
-function unwrap(nodule, name) {
-    if (!nodule || !nodule[name]) {
-        logger("no function to unwrap.");
-        logger(new Error().stack);
-        return;
-    }
-    if (!nodule[name].__unwrap) logger("no original to unwrap to -- has " + name + " already been unwrapped?");
-    else return nodule[name].__unwrap();
-}
-function massUnwrap(nodules, names) {
-    if (!nodules) {
-        logger("must provide one or more modules to patch");
-        logger(new Error().stack);
-        return;
-    } else if (!Array.isArray(nodules)) nodules = [
-        nodules
-    ];
-    if (!(names && Array.isArray(names))) {
-        logger("must provide one or more functions to unwrap on modules");
-        return;
-    }
-    nodules.forEach(function(nodule) {
-        names.forEach(function(name) {
-            unwrap(nodule, name);
-        });
-    });
-}
-shimmer.wrap = wrap;
-shimmer.massWrap = massWrap;
-shimmer.unwrap = unwrap;
-shimmer.massUnwrap = massUnwrap;
-module.exports = shimmer;
-
-},{}],"3YarC":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-/**
- * function to execute patched function and being able to catch errors
- * @param execute - function to be executed
- * @param onFinish - callback to run when execute finishes
- */ parcelHelpers.export(exports, "safeExecuteInTheMiddle", ()=>safeExecuteInTheMiddle);
-/**
- * Async function to execute patched function and being able to catch errors
- * @param execute - function to be executed
- * @param onFinish - callback to run when execute finishes
- */ parcelHelpers.export(exports, "safeExecuteInTheMiddleAsync", ()=>safeExecuteInTheMiddleAsync);
-/**
- * Checks if certain function has been already wrapped
- * @param func
- */ parcelHelpers.export(exports, "isWrapped", ()=>isWrapped);
-var __awaiter = undefined && undefined.__awaiter || function(thisArg, _arguments, P, generator) {
-    function adopt(value) {
-        return value instanceof P ? value : new P(function(resolve) {
-            resolve(value);
-        });
-    }
-    return new (P || (P = Promise))(function(resolve, reject) {
-        function fulfilled(value) {
-            try {
-                step(generator.next(value));
-            } catch (e) {
-                reject(e);
-            }
-        }
-        function rejected(value) {
-            try {
-                step(generator["throw"](value));
-            } catch (e) {
-                reject(e);
-            }
-        }
-        function step(result) {
-            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
-        }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = undefined && undefined.__generator || function(thisArg, body) {
-    var _ = {
-        label: 0,
-        sent: function() {
-            if (t[0] & 1) throw t[1];
-            return t[1];
-        },
-        trys: [],
-        ops: []
-    }, f, y, t, g;
-    return g = {
-        next: verb(0),
-        "throw": verb(1),
-        "return": verb(2)
-    }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
-        return this;
-    }), g;
-    function verb(n) {
-        return function(v) {
-            return step([
-                n,
-                v
-            ]);
-        };
-    }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while(_)try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [
-                op[0] & 2,
-                t.value
-            ];
-            switch(op[0]){
-                case 0:
-                case 1:
-                    t = op;
-                    break;
-                case 4:
-                    _.label++;
-                    return {
-                        value: op[1],
-                        done: false
-                    };
-                case 5:
-                    _.label++;
-                    y = op[1];
-                    op = [
-                        0
-                    ];
-                    continue;
-                case 7:
-                    op = _.ops.pop();
-                    _.trys.pop();
-                    continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
-                        _ = 0;
-                        continue;
-                    }
-                    if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
-                        _.label = op[1];
-                        break;
-                    }
-                    if (op[0] === 6 && _.label < t[1]) {
-                        _.label = t[1];
-                        t = op;
-                        break;
-                    }
-                    if (t && _.label < t[2]) {
-                        _.label = t[2];
-                        _.ops.push(op);
-                        break;
-                    }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop();
-                    continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) {
-            op = [
-                6,
-                e
-            ];
-            y = 0;
-        } finally{
-            f = t = 0;
-        }
-        if (op[0] & 5) throw op[1];
-        return {
-            value: op[0] ? op[1] : void 0,
-            done: true
-        };
-    }
-};
-function safeExecuteInTheMiddle(execute, onFinish, preventThrowingError) {
-    var error;
-    var result;
-    try {
-        result = execute();
-    } catch (e) {
-        error = e;
-    } finally{
-        onFinish(error, result);
-        if (error && !preventThrowingError) // eslint-disable-next-line no-unsafe-finally
-        throw error;
-        // eslint-disable-next-line no-unsafe-finally
-        return result;
-    }
-}
-function safeExecuteInTheMiddleAsync(execute, onFinish, preventThrowingError) {
-    return __awaiter(this, void 0, void 0, function() {
-        var error, result, e_1;
-        return __generator(this, function(_a) {
-            switch(_a.label){
-                case 0:
-                    _a.trys.push([
-                        0,
-                        2,
-                        3,
-                        4
-                    ]);
-                    return [
-                        4 /*yield*/ ,
-                        execute()
-                    ];
-                case 1:
-                    result = _a.sent();
-                    return [
-                        3 /*break*/ ,
-                        4
-                    ];
-                case 2:
-                    e_1 = _a.sent();
-                    error = e_1;
-                    return [
-                        3 /*break*/ ,
-                        4
-                    ];
-                case 3:
-                    onFinish(error, result);
-                    if (error && !preventThrowingError) // eslint-disable-next-line no-unsafe-finally
-                    throw error;
-                    // eslint-disable-next-line no-unsafe-finally
-                    return [
-                        2 /*return*/ ,
-                        result
-                    ];
-                case 4:
-                    return [
-                        2 /*return*/ 
-                    ];
-            }
-        });
-    });
-}
-function isWrapped(func) {
-    return typeof func === "function" && typeof func.__original === "function" && typeof func.__unwrap === "function" && func.__wrapped === true;
-}
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"dZ0bF":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "getWebAutoInstrumentations", ()=>(0, _utils.getWebAutoInstrumentations));
-var _utils = require("./utils");
-
-},{"./utils":"lSUFd","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"lSUFd":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "getWebAutoInstrumentations", ()=>getWebAutoInstrumentations);
-var _api = require("@opentelemetry/api");
-var _instrumentationDocumentLoad = require("@opentelemetry/instrumentation-document-load");
-var _instrumentationFetch = require("@opentelemetry/instrumentation-fetch");
-var _instrumentationUserInteraction = require("@opentelemetry/instrumentation-user-interaction");
-var _instrumentationXmlHttpRequest = require("@opentelemetry/instrumentation-xml-http-request");
-var InstrumentationMap = {
-    "@opentelemetry/instrumentation-document-load": (0, _instrumentationDocumentLoad.DocumentLoadInstrumentation),
-    "@opentelemetry/instrumentation-fetch": (0, _instrumentationFetch.FetchInstrumentation),
-    "@opentelemetry/instrumentation-user-interaction": (0, _instrumentationUserInteraction.UserInteractionInstrumentation),
-    "@opentelemetry/instrumentation-xml-http-request": (0, _instrumentationXmlHttpRequest.XMLHttpRequestInstrumentation)
-};
-function getWebAutoInstrumentations(inputConfigs) {
-    var _a;
-    if (inputConfigs === void 0) inputConfigs = {};
-    for(var _i = 0, _b = Object.keys(inputConfigs); _i < _b.length; _i++){
-        var name_1 = _b[_i];
-        if (!Object.prototype.hasOwnProperty.call(InstrumentationMap, name_1)) {
-            (0, _api.diag).error('Provided instrumentation name "' + name_1 + '" not found');
-            continue;
-        }
-    }
-    var instrumentations = [];
-    for(var _c = 0, _d = Object.keys(InstrumentationMap); _c < _d.length; _c++){
-        var name_2 = _d[_c];
-        var Instance = InstrumentationMap[name_2];
-        // Defaults are defined by the instrumentation itself
-        var userConfig = (_a = inputConfigs[name_2]) !== null && _a !== void 0 ? _a : {};
-        if (userConfig.enabled === false) {
-            (0, _api.diag).debug("Disabling instrumentation for " + name_2);
-            continue;
-        }
-        try {
-            (0, _api.diag).debug("Loading instrumentation for " + name_2);
-            instrumentations.push(new Instance(userConfig));
-        } catch (e) {
-            (0, _api.diag).error(e);
-        }
-    }
-    return instrumentations;
-}
-
-},{"@opentelemetry/api":"6AC4z","@opentelemetry/instrumentation-document-load":"exbkI","@opentelemetry/instrumentation-fetch":"iWezV","@opentelemetry/instrumentation-user-interaction":"lOen7","@opentelemetry/instrumentation-xml-http-request":"jYPe9","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"exbkI":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _instrumentation = require("./instrumentation");
-parcelHelpers.exportAll(_instrumentation, exports);
-var _attributeNames = require("./enums/AttributeNames");
-parcelHelpers.exportAll(_attributeNames, exports);
-var _types = require("./types");
-parcelHelpers.exportAll(_types, exports);
-
-},{"./instrumentation":"b9rsS","./enums/AttributeNames":"2uTf8","./types":"5cOeU","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"b9rsS":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "DocumentLoadInstrumentation", ()=>DocumentLoadInstrumentation);
-var _api = require("@opentelemetry/api");
-var _core = require("@opentelemetry/core");
-var _sdkTraceWeb = require("@opentelemetry/sdk-trace-web");
-var _instrumentation = require("@opentelemetry/instrumentation");
-var _attributeNames = require("./enums/AttributeNames");
-var _version = require("./version");
-var _semanticConventions = require("@opentelemetry/semantic-conventions");
-var _utils = require("./utils");
-var __extends = undefined && undefined.__extends || function() {
-    var extendStatics = function(d, b) {
-        extendStatics = Object.setPrototypeOf || ({
-            __proto__: []
-        }) instanceof Array && function(d, b) {
-            d.__proto__ = b;
-        } || function(d, b) {
-            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
-        };
-        return extendStatics(d, b);
-    };
-    return function(d, b) {
-        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() {
-            this.constructor = d;
-        }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-}();
-/**
- * This class represents a document load plugin
- */ var DocumentLoadInstrumentation = /** @class */ function(_super) {
-    __extends(DocumentLoadInstrumentation, _super);
-    /**
-     *
-     * @param config
-     */ function DocumentLoadInstrumentation(config) {
-        if (config === void 0) config = {};
-        var _this = _super.call(this, "@opentelemetry/instrumentation-document-load", (0, _version.VERSION), config) || this;
-        _this.component = "document-load";
-        _this.version = "1";
-        _this.moduleName = _this.component;
-        return _this;
-    }
-    DocumentLoadInstrumentation.prototype.init = function() {};
-    /**
-     * callback to be executed when page is loaded
-     */ DocumentLoadInstrumentation.prototype._onDocumentLoaded = function() {
-        var _this = this;
-        // Timeout is needed as load event doesn't have yet the performance metrics for loadEnd.
-        // Support for event "loadend" is very limited and cannot be used
-        window.setTimeout(function() {
-            _this._collectPerformance();
-        });
-    };
-    /**
-     * Adds spans for all resources
-     * @param rootSpan
-     */ DocumentLoadInstrumentation.prototype._addResourcesSpans = function(rootSpan) {
-        var _this = this;
-        var _a, _b;
-        var resources = (_b = (_a = (0, _core.otperformance)).getEntriesByType) === null || _b === void 0 ? void 0 : _b.call(_a, "resource");
-        if (resources) resources.forEach(function(resource) {
-            _this._initResourceSpan(resource, rootSpan);
-        });
-    };
-    /**
-     * Collects information about performance and creates appropriate spans
-     */ DocumentLoadInstrumentation.prototype._collectPerformance = function() {
-        var _this = this;
-        var metaElement = Array.from(document.getElementsByTagName("meta")).find(function(e) {
-            return e.getAttribute("name") === (0, _core.TRACE_PARENT_HEADER);
-        });
-        var entries = (0, _utils.getPerformanceNavigationEntries)();
-        var traceparent = metaElement && metaElement.content || "";
-        (0, _api.context).with((0, _api.propagation).extract((0, _api.ROOT_CONTEXT), {
-            traceparent: traceparent
-        }), function() {
-            var _a;
-            var rootSpan = _this._startSpan((0, _attributeNames.AttributeNames).DOCUMENT_LOAD, (0, _sdkTraceWeb.PerformanceTimingNames).FETCH_START, entries);
-            if (!rootSpan) return;
-            (0, _api.context).with((0, _api.trace).setSpan((0, _api.context).active(), rootSpan), function() {
-                var fetchSpan = _this._startSpan((0, _attributeNames.AttributeNames).DOCUMENT_FETCH, (0, _sdkTraceWeb.PerformanceTimingNames).FETCH_START, entries);
-                if (fetchSpan) {
-                    fetchSpan.setAttribute((0, _semanticConventions.SEMATTRS_HTTP_URL), location.href);
-                    (0, _api.context).with((0, _api.trace).setSpan((0, _api.context).active(), fetchSpan), function() {
-                        var _a;
-                        (0, _sdkTraceWeb.addSpanNetworkEvents)(fetchSpan, entries);
-                        _this._addCustomAttributesOnSpan(fetchSpan, (_a = _this._getConfig().applyCustomAttributesOnSpan) === null || _a === void 0 ? void 0 : _a.documentFetch);
-                        _this._endSpan(fetchSpan, (0, _sdkTraceWeb.PerformanceTimingNames).RESPONSE_END, entries);
-                    });
-                }
-            });
-            rootSpan.setAttribute((0, _semanticConventions.SEMATTRS_HTTP_URL), location.href);
-            rootSpan.setAttribute((0, _semanticConventions.SEMATTRS_HTTP_USER_AGENT), navigator.userAgent);
-            _this._addResourcesSpans(rootSpan);
-            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).FETCH_START, entries);
-            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).UNLOAD_EVENT_START, entries);
-            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).UNLOAD_EVENT_END, entries);
-            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).DOM_INTERACTIVE, entries);
-            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).DOM_CONTENT_LOADED_EVENT_START, entries);
-            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).DOM_CONTENT_LOADED_EVENT_END, entries);
-            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).DOM_COMPLETE, entries);
-            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).LOAD_EVENT_START, entries);
-            (0, _sdkTraceWeb.addSpanNetworkEvent)(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).LOAD_EVENT_END, entries);
-            (0, _utils.addSpanPerformancePaintEvents)(rootSpan);
-            _this._addCustomAttributesOnSpan(rootSpan, (_a = _this._getConfig().applyCustomAttributesOnSpan) === null || _a === void 0 ? void 0 : _a.documentLoad);
-            _this._endSpan(rootSpan, (0, _sdkTraceWeb.PerformanceTimingNames).LOAD_EVENT_END, entries);
-        });
-    };
-    /**
-     * Helper function for ending span
-     * @param span
-     * @param performanceName name of performance entry for time end
-     * @param entries
-     */ DocumentLoadInstrumentation.prototype._endSpan = function(span, performanceName, entries) {
-        // span can be undefined when entries are missing the certain performance - the span will not be created
-        if (span) {
-            if ((0, _sdkTraceWeb.hasKey)(entries, performanceName)) span.end(entries[performanceName]);
-            else // just end span
-            span.end();
-        }
-    };
-    /**
-     * Creates and ends a span with network information about resource added as timed events
-     * @param resource
-     * @param parentSpan
-     */ DocumentLoadInstrumentation.prototype._initResourceSpan = function(resource, parentSpan) {
-        var _a;
-        var span = this._startSpan((0, _attributeNames.AttributeNames).RESOURCE_FETCH, (0, _sdkTraceWeb.PerformanceTimingNames).FETCH_START, resource, parentSpan);
-        if (span) {
-            span.setAttribute((0, _semanticConventions.SEMATTRS_HTTP_URL), resource.name);
-            (0, _sdkTraceWeb.addSpanNetworkEvents)(span, resource);
-            this._addCustomAttributesOnResourceSpan(span, resource, (_a = this._getConfig().applyCustomAttributesOnSpan) === null || _a === void 0 ? void 0 : _a.resourceFetch);
-            this._endSpan(span, (0, _sdkTraceWeb.PerformanceTimingNames).RESPONSE_END, resource);
-        }
-    };
-    /**
-     * Helper function for starting a span
-     * @param spanName name of span
-     * @param performanceName name of performance entry for time start
-     * @param entries
-     * @param parentSpan
-     */ DocumentLoadInstrumentation.prototype._startSpan = function(spanName, performanceName, entries, parentSpan) {
-        if ((0, _sdkTraceWeb.hasKey)(entries, performanceName) && typeof entries[performanceName] === "number") {
-            var span = this.tracer.startSpan(spanName, {
-                startTime: entries[performanceName]
-            }, parentSpan ? (0, _api.trace).setSpan((0, _api.context).active(), parentSpan) : undefined);
-            return span;
-        }
-        return undefined;
-    };
-    /**
-     * executes callback {_onDocumentLoaded} when the page is loaded
-     */ DocumentLoadInstrumentation.prototype._waitForPageLoad = function() {
-        if (window.document.readyState === "complete") this._onDocumentLoaded();
-        else {
-            this._onDocumentLoaded = this._onDocumentLoaded.bind(this);
-            window.addEventListener("load", this._onDocumentLoaded);
-        }
-    };
-    DocumentLoadInstrumentation.prototype._getConfig = function() {
-        return this._config;
-    };
-    /**
-     * adds custom attributes to root span if configured
-     */ DocumentLoadInstrumentation.prototype._addCustomAttributesOnSpan = function(span, applyCustomAttributesOnSpan) {
-        var _this = this;
-        if (applyCustomAttributesOnSpan) (0, _instrumentation.safeExecuteInTheMiddle)(function() {
-            return applyCustomAttributesOnSpan(span);
-        }, function(error) {
-            if (!error) return;
-            _this._diag.error("addCustomAttributesOnSpan", error);
-        }, true);
-    };
-    /**
-     * adds custom attributes to span if configured
-     */ DocumentLoadInstrumentation.prototype._addCustomAttributesOnResourceSpan = function(span, resource, applyCustomAttributesOnSpan) {
-        var _this = this;
-        if (applyCustomAttributesOnSpan) (0, _instrumentation.safeExecuteInTheMiddle)(function() {
-            return applyCustomAttributesOnSpan(span, resource);
-        }, function(error) {
-            if (!error) return;
-            _this._diag.error("addCustomAttributesOnResourceSpan", error);
-        }, true);
-    };
-    /**
-     * implements enable function
-     */ DocumentLoadInstrumentation.prototype.enable = function() {
-        // remove previously attached load to avoid adding the same event twice
-        // in case of multiple enable calling.
-        window.removeEventListener("load", this._onDocumentLoaded);
-        this._waitForPageLoad();
-    };
-    /**
-     * implements disable function
-     */ DocumentLoadInstrumentation.prototype.disable = function() {
-        window.removeEventListener("load", this._onDocumentLoaded);
-    };
-    return DocumentLoadInstrumentation;
-}((0, _instrumentation.InstrumentationBase));
-
-},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","@opentelemetry/sdk-trace-web":"eXZZL","@opentelemetry/instrumentation":"3OTpd","./enums/AttributeNames":"2uTf8","./version":"kjKSa","@opentelemetry/semantic-conventions":"lCgfj","./utils":"hRpx5","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"2uTf8":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "AttributeNames", ()=>AttributeNames);
-var AttributeNames;
-(function(AttributeNames) {
-    AttributeNames["DOCUMENT_LOAD"] = "documentLoad";
-    AttributeNames["DOCUMENT_FETCH"] = "documentFetch";
-    AttributeNames["RESOURCE_FETCH"] = "resourceFetch";
-})(AttributeNames || (AttributeNames = {}));
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"kjKSa":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ // this is autogenerated file, see scripts/version-update.js
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "VERSION", ()=>VERSION);
-var VERSION = "0.37.0";
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"hRpx5":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "getPerformanceNavigationEntries", ()=>getPerformanceNavigationEntries);
-parcelHelpers.export(exports, "addSpanPerformancePaintEvents", ()=>addSpanPerformancePaintEvents);
-var _core = require("@opentelemetry/core");
-var _sdkTraceWeb = require("@opentelemetry/sdk-trace-web");
-var _eventNames = require("./enums/EventNames");
-var getPerformanceNavigationEntries = function() {
-    var _a, _b;
-    var entries = {};
-    var performanceNavigationTiming = (_b = (_a = (0, _core.otperformance)).getEntriesByType) === null || _b === void 0 ? void 0 : _b.call(_a, "navigation")[0];
-    if (performanceNavigationTiming) {
-        var keys = Object.values((0, _sdkTraceWeb.PerformanceTimingNames));
-        keys.forEach(function(key) {
-            if ((0, _sdkTraceWeb.hasKey)(performanceNavigationTiming, key)) {
-                var value = performanceNavigationTiming[key];
-                if (typeof value === "number") entries[key] = value;
-            }
-        });
-    } else {
-        // // fallback to previous version
-        var perf = (0, _core.otperformance);
-        var performanceTiming_1 = perf.timing;
-        if (performanceTiming_1) {
-            var keys = Object.values((0, _sdkTraceWeb.PerformanceTimingNames));
-            keys.forEach(function(key) {
-                if ((0, _sdkTraceWeb.hasKey)(performanceTiming_1, key)) {
-                    var value = performanceTiming_1[key];
-                    if (typeof value === "number") entries[key] = value;
-                }
-            });
-        }
-    }
-    return entries;
-};
-var performancePaintNames = {
-    "first-paint": (0, _eventNames.EventNames).FIRST_PAINT,
-    "first-contentful-paint": (0, _eventNames.EventNames).FIRST_CONTENTFUL_PAINT
-};
-var addSpanPerformancePaintEvents = function(span) {
-    var _a, _b;
-    var performancePaintTiming = (_b = (_a = (0, _core.otperformance)).getEntriesByType) === null || _b === void 0 ? void 0 : _b.call(_a, "paint");
-    if (performancePaintTiming) performancePaintTiming.forEach(function(_a) {
-        var name = _a.name, startTime = _a.startTime;
-        if ((0, _sdkTraceWeb.hasKey)(performancePaintNames, name)) span.addEvent(performancePaintNames[name], startTime);
-    });
-};
-
-},{"@opentelemetry/core":"dBsXh","@opentelemetry/sdk-trace-web":"eXZZL","./enums/EventNames":"kWXpn","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"kWXpn":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "EventNames", ()=>EventNames);
-var EventNames;
-(function(EventNames) {
-    EventNames["FIRST_PAINT"] = "firstPaint";
-    EventNames["FIRST_CONTENTFUL_PAINT"] = "firstContentfulPaint";
-})(EventNames || (EventNames = {}));
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"5cOeU":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"iWezV":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _fetch = require("./fetch");
-parcelHelpers.exportAll(_fetch, exports);
-
-},{"./fetch":"3HP4m","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"3HP4m":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "FetchInstrumentation", ()=>FetchInstrumentation);
-var _api = require("@opentelemetry/api");
-var _instrumentation = require("@opentelemetry/instrumentation");
-var _core = require("@opentelemetry/core");
-var _sdkTraceWeb = require("@opentelemetry/sdk-trace-web");
-var _attributeNames = require("./enums/AttributeNames");
-var _semanticConventions = require("@opentelemetry/semantic-conventions");
-var _version = require("./version");
-var process = require("ec4383a7c1392e8d");
-var __extends = undefined && undefined.__extends || function() {
-    var extendStatics = function(d, b) {
-        extendStatics = Object.setPrototypeOf || ({
-            __proto__: []
-        }) instanceof Array && function(d, b) {
-            d.__proto__ = b;
-        } || function(d, b) {
-            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
-        };
-        return extendStatics(d, b);
-    };
-    return function(d, b) {
-        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() {
-            this.constructor = d;
-        }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-}();
-var _a;
-// how long to wait for observer to collect information about resources
-// this is needed as event "load" is called before observer
-// hard to say how long it should really wait, seems like 300ms is
-// safe enough
-var OBSERVER_WAIT_TIME_MS = 300;
-var isNode = typeof process === "object" && ((_a = process.release) === null || _a === void 0 ? void 0 : _a.name) === "node";
-/**
- * This class represents a fetch plugin for auto instrumentation
- */ var FetchInstrumentation = /** @class */ function(_super) {
-    __extends(FetchInstrumentation, _super);
-    function FetchInstrumentation(config) {
-        var _this = _super.call(this, "@opentelemetry/instrumentation-fetch", (0, _version.VERSION), config) || this;
-        _this.component = "fetch";
-        _this.version = (0, _version.VERSION);
-        _this.moduleName = _this.component;
-        _this._usedResources = new WeakSet();
-        _this._tasksCount = 0;
-        return _this;
-    }
-    FetchInstrumentation.prototype.init = function() {};
-    FetchInstrumentation.prototype._getConfig = function() {
-        return this._config;
-    };
-    /**
-     * Add cors pre flight child span
-     * @param span
-     * @param corsPreFlightRequest
-     */ FetchInstrumentation.prototype._addChildSpan = function(span, corsPreFlightRequest) {
-        var childSpan = this.tracer.startSpan("CORS Preflight", {
-            startTime: corsPreFlightRequest[_sdkTraceWeb.PerformanceTimingNames.FETCH_START]
-        }, _api.trace.setSpan(_api.context.active(), span));
-        if (!this._getConfig().ignoreNetworkEvents) _sdkTraceWeb.addSpanNetworkEvents(childSpan, corsPreFlightRequest);
-        childSpan.end(corsPreFlightRequest[_sdkTraceWeb.PerformanceTimingNames.RESPONSE_END]);
-    };
-    /**
-     * Adds more attributes to span just before ending it
-     * @param span
-     * @param response
-     */ FetchInstrumentation.prototype._addFinalSpanAttributes = function(span, response) {
-        var parsedUrl = _sdkTraceWeb.parseUrl(response.url);
-        span.setAttribute((0, _semanticConventions.SemanticAttributes).HTTP_STATUS_CODE, response.status);
-        if (response.statusText != null) span.setAttribute((0, _attributeNames.AttributeNames).HTTP_STATUS_TEXT, response.statusText);
-        span.setAttribute((0, _semanticConventions.SemanticAttributes).HTTP_HOST, parsedUrl.host);
-        span.setAttribute((0, _semanticConventions.SemanticAttributes).HTTP_SCHEME, parsedUrl.protocol.replace(":", ""));
-        if (typeof navigator !== "undefined") span.setAttribute((0, _semanticConventions.SemanticAttributes).HTTP_USER_AGENT, navigator.userAgent);
-    };
-    /**
-     * Add headers
-     * @param options
-     * @param spanUrl
-     */ FetchInstrumentation.prototype._addHeaders = function(options, spanUrl) {
-        if (!_sdkTraceWeb.shouldPropagateTraceHeaders(spanUrl, this._getConfig().propagateTraceHeaderCorsUrls)) {
-            var headers = {};
-            _api.propagation.inject(_api.context.active(), headers);
-            if (Object.keys(headers).length > 0) this._diag.debug("headers inject skipped due to CORS policy");
-            return;
-        }
-        if (options instanceof Request) _api.propagation.inject(_api.context.active(), options.headers, {
-            set: function(h, k, v) {
-                return h.set(k, typeof v === "string" ? v : String(v));
-            }
-        });
-        else if (options.headers instanceof Headers) _api.propagation.inject(_api.context.active(), options.headers, {
-            set: function(h, k, v) {
-                return h.set(k, typeof v === "string" ? v : String(v));
-            }
-        });
-        else if (options.headers instanceof Map) _api.propagation.inject(_api.context.active(), options.headers, {
-            set: function(h, k, v) {
-                return h.set(k, typeof v === "string" ? v : String(v));
-            }
-        });
-        else {
-            var headers = {};
-            _api.propagation.inject(_api.context.active(), headers);
-            options.headers = Object.assign({}, headers, options.headers || {});
-        }
-    };
-    /**
-     * Clears the resource timings and all resources assigned with spans
-     *     when {@link FetchPluginConfig.clearTimingResources} is
-     *     set to true (default false)
-     * @private
-     */ FetchInstrumentation.prototype._clearResources = function() {
-        if (this._tasksCount === 0 && this._getConfig().clearTimingResources) {
-            performance.clearResourceTimings();
-            this._usedResources = new WeakSet();
-        }
-    };
-    /**
-     * Creates a new span
-     * @param url
-     * @param options
-     */ FetchInstrumentation.prototype._createSpan = function(url, options) {
-        var _a;
-        if (options === void 0) options = {};
-        if (_core.isUrlIgnored(url, this._getConfig().ignoreUrls)) {
-            this._diag.debug("ignoring span as url matches ignored url");
-            return;
-        }
-        var method = (options.method || "GET").toUpperCase();
-        var spanName = "HTTP " + method;
-        return this.tracer.startSpan(spanName, {
-            kind: _api.SpanKind.CLIENT,
-            attributes: (_a = {}, _a[(0, _attributeNames.AttributeNames).COMPONENT] = this.moduleName, _a[(0, _semanticConventions.SemanticAttributes).HTTP_METHOD] = method, _a[(0, _semanticConventions.SemanticAttributes).HTTP_URL] = url, _a)
-        });
-    };
-    /**
-     * Finds appropriate resource and add network events to the span
-     * @param span
-     * @param resourcesObserver
-     * @param endTime
-     */ FetchInstrumentation.prototype._findResourceAndAddNetworkEvents = function(span, resourcesObserver, endTime) {
-        var resources = resourcesObserver.entries;
-        if (!resources.length) {
-            if (!performance.getEntriesByType) return;
-            // fallback - either Observer is not available or it took longer
-            // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
-            // information
-            resources = performance.getEntriesByType("resource");
-        }
-        var resource = _sdkTraceWeb.getResource(resourcesObserver.spanUrl, resourcesObserver.startTime, endTime, resources, this._usedResources, "fetch");
-        if (resource.mainRequest) {
-            var mainRequest = resource.mainRequest;
-            this._markResourceAsUsed(mainRequest);
-            var corsPreFlightRequest = resource.corsPreFlightRequest;
-            if (corsPreFlightRequest) {
-                this._addChildSpan(span, corsPreFlightRequest);
-                this._markResourceAsUsed(corsPreFlightRequest);
-            }
-            if (!this._getConfig().ignoreNetworkEvents) _sdkTraceWeb.addSpanNetworkEvents(span, mainRequest);
-        }
-    };
-    /**
-     * Marks certain [resource]{@link PerformanceResourceTiming} when information
-     * from this is used to add events to span.
-     * This is done to avoid reusing the same resource again for next span
-     * @param resource
-     */ FetchInstrumentation.prototype._markResourceAsUsed = function(resource) {
-        this._usedResources.add(resource);
-    };
-    /**
-     * Finish span, add attributes, network events etc.
-     * @param span
-     * @param spanData
-     * @param response
-     */ FetchInstrumentation.prototype._endSpan = function(span, spanData, response) {
-        var _this = this;
-        var endTime = _core.millisToHrTime(Date.now());
-        var performanceEndTime = _core.hrTime();
-        this._addFinalSpanAttributes(span, response);
-        setTimeout(function() {
-            var _a;
-            (_a = spanData.observer) === null || _a === void 0 || _a.disconnect();
-            _this._findResourceAndAddNetworkEvents(span, spanData, performanceEndTime);
-            _this._tasksCount--;
-            _this._clearResources();
-            span.end(endTime);
-        }, OBSERVER_WAIT_TIME_MS);
-    };
-    /**
-     * Patches the constructor of fetch
-     */ FetchInstrumentation.prototype._patchConstructor = function() {
-        var _this = this;
-        return function(original) {
-            var plugin = _this;
-            return function patchConstructor() {
-                var args = [];
-                for(var _i = 0; _i < arguments.length; _i++)args[_i] = arguments[_i];
-                var self = this;
-                var url = _sdkTraceWeb.parseUrl(args[0] instanceof Request ? args[0].url : String(args[0])).href;
-                var options = args[0] instanceof Request ? args[0] : args[1] || {};
-                var createdSpan = plugin._createSpan(url, options);
-                if (!createdSpan) return original.apply(this, args);
-                var spanData = plugin._prepareSpanData(url);
-                function endSpanOnError(span, error) {
-                    plugin._applyAttributesAfterFetch(span, options, error);
-                    plugin._endSpan(span, spanData, {
-                        status: error.status || 0,
-                        statusText: error.message,
-                        url: url
-                    });
-                }
-                function endSpanOnSuccess(span, response) {
-                    plugin._applyAttributesAfterFetch(span, options, response);
-                    if (response.status >= 200 && response.status < 400) plugin._endSpan(span, spanData, response);
-                    else plugin._endSpan(span, spanData, {
-                        status: response.status,
-                        statusText: response.statusText,
-                        url: url
-                    });
-                }
-                function onSuccess(span, resolve, response) {
-                    try {
-                        var resClone = response.clone();
-                        var resClone4Hook_1 = response.clone();
-                        var body = resClone.body;
-                        if (body) {
-                            var reader_1 = body.getReader();
-                            var read_1 = function() {
-                                reader_1.read().then(function(_a) {
-                                    var done = _a.done;
-                                    if (done) endSpanOnSuccess(span, resClone4Hook_1);
-                                    else read_1();
-                                }, function(error) {
-                                    endSpanOnError(span, error);
-                                });
-                            };
-                            read_1();
-                        } else // some older browsers don't have .body implemented
-                        endSpanOnSuccess(span, response);
-                    } finally{
-                        resolve(response);
-                    }
-                }
-                function onError(span, reject, error) {
-                    try {
-                        endSpanOnError(span, error);
-                    } finally{
-                        reject(error);
-                    }
-                }
-                return new Promise(function(resolve, reject) {
-                    return _api.context.with(_api.trace.setSpan(_api.context.active(), createdSpan), function() {
-                        plugin._addHeaders(options, url);
-                        plugin._tasksCount++;
-                        // TypeScript complains about arrow function captured a this typed as globalThis
-                        // ts(7041)
-                        return original.apply(self, options instanceof Request ? [
-                            options
-                        ] : [
-                            url,
-                            options
-                        ]).then(onSuccess.bind(self, createdSpan, resolve), onError.bind(self, createdSpan, reject));
-                    });
-                });
-            };
-        };
-    };
-    FetchInstrumentation.prototype._applyAttributesAfterFetch = function(span, request, result) {
-        var _this = this;
-        var applyCustomAttributesOnSpan = this._getConfig().applyCustomAttributesOnSpan;
-        if (applyCustomAttributesOnSpan) (0, _instrumentation.safeExecuteInTheMiddle)(function() {
-            return applyCustomAttributesOnSpan(span, request, result);
-        }, function(error) {
-            if (!error) return;
-            _this._diag.error("applyCustomAttributesOnSpan", error);
-        }, true);
-    };
-    /**
-     * Prepares a span data - needed later for matching appropriate network
-     *     resources
-     * @param spanUrl
-     */ FetchInstrumentation.prototype._prepareSpanData = function(spanUrl) {
-        var startTime = _core.hrTime();
-        var entries = [];
-        if (typeof PerformanceObserver !== "function") return {
-            entries: entries,
-            startTime: startTime,
-            spanUrl: spanUrl
-        };
-        var observer = new PerformanceObserver(function(list) {
-            var perfObsEntries = list.getEntries();
-            perfObsEntries.forEach(function(entry) {
-                if (entry.initiatorType === "fetch" && entry.name === spanUrl) entries.push(entry);
-            });
-        });
-        observer.observe({
-            entryTypes: [
-                "resource"
-            ]
-        });
-        return {
-            entries: entries,
-            observer: observer,
-            startTime: startTime,
-            spanUrl: spanUrl
-        };
-    };
-    /**
-     * implements enable function
-     */ FetchInstrumentation.prototype.enable = function() {
-        if (isNode) {
-            // Node.js v18+ *does* have a global `fetch()`, but this package does not
-            // support instrumenting it.
-            this._diag.warn("this instrumentation is intended for web usage only, it does not instrument Node.js's fetch()");
-            return;
-        }
-        if ((0, _instrumentation.isWrapped)(fetch)) {
-            this._unwrap((0, _core._globalThis), "fetch");
-            this._diag.debug("removing previous patch for constructor");
-        }
-        this._wrap((0, _core._globalThis), "fetch", this._patchConstructor());
-    };
-    /**
-     * implements unpatch function
-     */ FetchInstrumentation.prototype.disable = function() {
-        if (isNode) return;
-        this._unwrap((0, _core._globalThis), "fetch");
-        this._usedResources = new WeakSet();
-    };
-    return FetchInstrumentation;
-}((0, _instrumentation.InstrumentationBase));
-
-},{"ec4383a7c1392e8d":"d5jf4","@opentelemetry/api":"6AC4z","@opentelemetry/instrumentation":"3OTpd","@opentelemetry/core":"dBsXh","@opentelemetry/sdk-trace-web":"eXZZL","./enums/AttributeNames":"2Hbiw","@opentelemetry/semantic-conventions":"lCgfj","./version":"cZp6b","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"2Hbiw":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ /**
- * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/http.md
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "AttributeNames", ()=>AttributeNames);
-var AttributeNames;
-(function(AttributeNames) {
-    AttributeNames["COMPONENT"] = "component";
-    AttributeNames["HTTP_ERROR_NAME"] = "http.error_name";
-    AttributeNames["HTTP_STATUS_TEXT"] = "http.status_text";
-})(AttributeNames || (AttributeNames = {}));
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"cZp6b":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ // this is autogenerated file, see scripts/version-update.js
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "VERSION", ()=>VERSION);
-var VERSION = "0.50.0";
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"lOen7":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _instrumentation = require("./instrumentation");
-parcelHelpers.exportAll(_instrumentation, exports);
-var _types = require("./types");
-parcelHelpers.exportAll(_types, exports);
-var _attributeNames = require("./enums/AttributeNames");
-parcelHelpers.exportAll(_attributeNames, exports);
-
-},{"./instrumentation":"5EeMl","./types":false,"./enums/AttributeNames":false,"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"5EeMl":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "UserInteractionInstrumentation", ()=>UserInteractionInstrumentation);
-/// <reference types="zone.js" />
-var _instrumentation = require("@opentelemetry/instrumentation");
-var _api = require("@opentelemetry/api");
-var _core = require("@opentelemetry/core");
-var _sdkTraceWeb = require("@opentelemetry/sdk-trace-web");
-var _attributeNames = require("./enums/AttributeNames");
-var _version = require("./version");
-var __extends = undefined && undefined.__extends || function() {
-    var extendStatics = function(d, b) {
-        extendStatics = Object.setPrototypeOf || ({
-            __proto__: []
-        }) instanceof Array && function(d, b) {
-            d.__proto__ = b;
-        } || function(d, b) {
-            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
-        };
-        return extendStatics(d, b);
-    };
-    return function(d, b) {
-        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() {
-            this.constructor = d;
-        }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-}();
-var ZONE_CONTEXT_KEY = "OT_ZONE_CONTEXT";
-var EVENT_NAVIGATION_NAME = "Navigation:";
-var DEFAULT_EVENT_NAMES = [
-    "click"
-];
-function defaultShouldPreventSpanCreation() {
-    return false;
-}
-/**
- * This class represents a UserInteraction plugin for auto instrumentation.
- * If zone.js is available then it patches the zone otherwise it patches
- * addEventListener of HTMLElement
- */ var UserInteractionInstrumentation = /** @class */ function(_super) {
-    __extends(UserInteractionInstrumentation, _super);
-    function UserInteractionInstrumentation(config) {
-        var _a;
-        var _this = _super.call(this, "@opentelemetry/instrumentation-user-interaction", (0, _version.VERSION), config) || this;
-        _this.version = (0, _version.VERSION);
-        _this.moduleName = "user-interaction";
-        _this._spansData = new WeakMap();
-        // for addEventListener/removeEventListener state
-        _this._wrappedListeners = new WeakMap();
-        // for event bubbling
-        _this._eventsSpanMap = new WeakMap();
-        _this._eventNames = new Set((_a = config === null || config === void 0 ? void 0 : config.eventNames) !== null && _a !== void 0 ? _a : DEFAULT_EVENT_NAMES);
-        _this._shouldPreventSpanCreation = typeof (config === null || config === void 0 ? void 0 : config.shouldPreventSpanCreation) === "function" ? config.shouldPreventSpanCreation : defaultShouldPreventSpanCreation;
-        return _this;
-    }
-    UserInteractionInstrumentation.prototype.init = function() {};
-    /**
-     * This will check if last task was timeout and will save the time to
-     * fix the user interaction when nothing happens
-     * This timeout comes from xhr plugin which is needed to collect information
-     * about last xhr main request from observer
-     * @param task
-     * @param span
-     */ UserInteractionInstrumentation.prototype._checkForTimeout = function(task, span) {
-        var spanData = this._spansData.get(span);
-        if (spanData) {
-            if (task.source === "setTimeout") spanData.hrTimeLastTimeout = (0, _core.hrTime)();
-            else if (task.source !== "Promise.then" && task.source !== "setTimeout") spanData.hrTimeLastTimeout = undefined;
-        }
-    };
-    /**
-     * Controls whether or not to create a span, based on the event type.
-     */ UserInteractionInstrumentation.prototype._allowEventName = function(eventName) {
-        return this._eventNames.has(eventName);
-    };
-    /**
-     * Creates a new span
-     * @param element
-     * @param eventName
-     * @param parentSpan
-     */ UserInteractionInstrumentation.prototype._createSpan = function(element, eventName, parentSpan) {
-        var _a;
-        if (!(element instanceof HTMLElement)) return undefined;
-        if (!element.getAttribute) return undefined;
-        if (element.hasAttribute("disabled")) return undefined;
-        if (!this._allowEventName(eventName)) return undefined;
-        var xpath = (0, _sdkTraceWeb.getElementXPath)(element, true);
-        try {
-            var span = this.tracer.startSpan(eventName, {
-                attributes: (_a = {}, _a[(0, _attributeNames.AttributeNames).EVENT_TYPE] = eventName, _a[(0, _attributeNames.AttributeNames).TARGET_ELEMENT] = element.tagName, _a[(0, _attributeNames.AttributeNames).TARGET_XPATH] = xpath, _a[(0, _attributeNames.AttributeNames).HTTP_URL] = window.location.href, _a)
-            }, parentSpan ? _api.trace.setSpan(_api.context.active(), parentSpan) : undefined);
-            if (this._shouldPreventSpanCreation(eventName, element, span) === true) return undefined;
-            this._spansData.set(span, {
-                taskCount: 0
-            });
-            return span;
-        } catch (e) {
-            this._diag.error("failed to start create new user interaction span", e);
-        }
-        return undefined;
-    };
-    /**
-     * Decrement number of tasks that left in zone,
-     * This is needed to be able to end span when no more tasks left
-     * @param span
-     */ UserInteractionInstrumentation.prototype._decrementTask = function(span) {
-        var spanData = this._spansData.get(span);
-        if (spanData) {
-            spanData.taskCount--;
-            if (spanData.taskCount === 0) this._tryToEndSpan(span, spanData.hrTimeLastTimeout);
-        }
-    };
-    /**
-     * Return the current span
-     * @param zone
-     * @private
-     */ UserInteractionInstrumentation.prototype._getCurrentSpan = function(zone) {
-        var context = zone.get(ZONE_CONTEXT_KEY);
-        if (context) return _api.trace.getSpan(context);
-        return context;
-    };
-    /**
-     * Increment number of tasks that are run within the same zone.
-     *     This is needed to be able to end span when no more tasks left
-     * @param span
-     */ UserInteractionInstrumentation.prototype._incrementTask = function(span) {
-        var spanData = this._spansData.get(span);
-        if (spanData) spanData.taskCount++;
-    };
-    /**
-     * Returns true iff we should use the patched callback; false if it's already been patched
-     */ UserInteractionInstrumentation.prototype.addPatchedListener = function(on, type, listener, wrappedListener) {
-        var listener2Type = this._wrappedListeners.get(listener);
-        if (!listener2Type) {
-            listener2Type = new Map();
-            this._wrappedListeners.set(listener, listener2Type);
-        }
-        var element2patched = listener2Type.get(type);
-        if (!element2patched) {
-            element2patched = new Map();
-            listener2Type.set(type, element2patched);
-        }
-        if (element2patched.has(on)) return false;
-        element2patched.set(on, wrappedListener);
-        return true;
-    };
-    /**
-     * Returns the patched version of the callback (or undefined)
-     */ UserInteractionInstrumentation.prototype.removePatchedListener = function(on, type, listener) {
-        var listener2Type = this._wrappedListeners.get(listener);
-        if (!listener2Type) return undefined;
-        var element2patched = listener2Type.get(type);
-        if (!element2patched) return undefined;
-        var patched = element2patched.get(on);
-        if (patched) {
-            element2patched.delete(on);
-            if (element2patched.size === 0) {
-                listener2Type.delete(type);
-                if (listener2Type.size === 0) this._wrappedListeners.delete(listener);
-            }
-        }
-        return patched;
-    };
-    // utility method to deal with the Function|EventListener nature of addEventListener
-    UserInteractionInstrumentation.prototype._invokeListener = function(listener, target, args) {
-        if (typeof listener === "function") return listener.apply(target, args);
-        else return listener.handleEvent(args[0]);
-    };
-    /**
-     * This patches the addEventListener of HTMLElement to be able to
-     * auto instrument the click events
-     * This is done when zone is not available
-     */ UserInteractionInstrumentation.prototype._patchAddEventListener = function() {
-        var plugin = this;
-        return function(original) {
-            return function addEventListenerPatched(type, listener, useCapture) {
-                // Forward calls with listener = null
-                if (!listener) return original.call(this, type, listener, useCapture);
-                // filter out null (typeof null === 'object')
-                var once = useCapture && typeof useCapture === "object" && useCapture.once;
-                var patchedListener = function() {
-                    var _this = this;
-                    var args = [];
-                    for(var _i = 0; _i < arguments.length; _i++)args[_i] = arguments[_i];
-                    var parentSpan;
-                    var event = args[0];
-                    var target = event === null || event === void 0 ? void 0 : event.target;
-                    if (event) parentSpan = plugin._eventsSpanMap.get(event);
-                    if (once) plugin.removePatchedListener(this, type, listener);
-                    var span = plugin._createSpan(target, type, parentSpan);
-                    if (span) {
-                        if (event) plugin._eventsSpanMap.set(event, span);
-                        return _api.context.with(_api.trace.setSpan(_api.context.active(), span), function() {
-                            var result = plugin._invokeListener(listener, _this, args);
-                            // no zone so end span immediately
-                            span.end();
-                            return result;
-                        });
-                    } else return plugin._invokeListener(listener, this, args);
-                };
-                if (plugin.addPatchedListener(this, type, listener, patchedListener)) return original.call(this, type, patchedListener, useCapture);
-            };
-        };
-    };
-    /**
-     * This patches the removeEventListener of HTMLElement to handle the fact that
-     * we patched the original callbacks
-     * This is done when zone is not available
-     */ UserInteractionInstrumentation.prototype._patchRemoveEventListener = function() {
-        var plugin = this;
-        return function(original) {
-            return function removeEventListenerPatched(type, listener, useCapture) {
-                var wrappedListener = plugin.removePatchedListener(this, type, listener);
-                if (wrappedListener) return original.call(this, type, wrappedListener, useCapture);
-                else return original.call(this, type, listener, useCapture);
-            };
-        };
-    };
-    /**
-     * Most browser provide event listener api via EventTarget in prototype chain.
-     * Exception to this is IE 11 which has it on the prototypes closest to EventTarget:
-     *
-     * * - has addEventListener in IE
-     * ** - has addEventListener in all other browsers
-     * ! - missing in IE
-     *
-     * HTMLElement -> Element -> Node * -> EventTarget **! -> Object
-     * Document -> Node * -> EventTarget **! -> Object
-     * Window * -> WindowProperties ! -> EventTarget **! -> Object
-     */ UserInteractionInstrumentation.prototype._getPatchableEventTargets = function() {
-        return window.EventTarget ? [
-            EventTarget.prototype
-        ] : [
-            Node.prototype,
-            Window.prototype
-        ];
-    };
-    /**
-     * Patches the history api
-     */ UserInteractionInstrumentation.prototype._patchHistoryApi = function() {
-        this._unpatchHistoryApi();
-        this._wrap(history, "replaceState", this._patchHistoryMethod());
-        this._wrap(history, "pushState", this._patchHistoryMethod());
-        this._wrap(history, "back", this._patchHistoryMethod());
-        this._wrap(history, "forward", this._patchHistoryMethod());
-        this._wrap(history, "go", this._patchHistoryMethod());
-    };
-    /**
-     * Patches the certain history api method
-     */ UserInteractionInstrumentation.prototype._patchHistoryMethod = function() {
-        var plugin = this;
-        return function(original) {
-            return function patchHistoryMethod() {
-                var args = [];
-                for(var _i = 0; _i < arguments.length; _i++)args[_i] = arguments[_i];
-                var url = "" + location.pathname + location.hash + location.search;
-                var result = original.apply(this, args);
-                var urlAfter = "" + location.pathname + location.hash + location.search;
-                if (url !== urlAfter) plugin._updateInteractionName(urlAfter);
-                return result;
-            };
-        };
-    };
-    /**
-     * unpatch the history api methods
-     */ UserInteractionInstrumentation.prototype._unpatchHistoryApi = function() {
-        if ((0, _instrumentation.isWrapped)(history.replaceState)) this._unwrap(history, "replaceState");
-        if ((0, _instrumentation.isWrapped)(history.pushState)) this._unwrap(history, "pushState");
-        if ((0, _instrumentation.isWrapped)(history.back)) this._unwrap(history, "back");
-        if ((0, _instrumentation.isWrapped)(history.forward)) this._unwrap(history, "forward");
-        if ((0, _instrumentation.isWrapped)(history.go)) this._unwrap(history, "go");
-    };
-    /**
-     * Updates interaction span name
-     * @param url
-     */ UserInteractionInstrumentation.prototype._updateInteractionName = function(url) {
-        var span = _api.trace.getSpan(_api.context.active());
-        if (span && typeof span.updateName === "function") span.updateName(EVENT_NAVIGATION_NAME + " " + url);
-    };
-    /**
-     * Patches zone cancel task - this is done to be able to correctly
-     * decrement the number of remaining tasks
-     */ UserInteractionInstrumentation.prototype._patchZoneCancelTask = function() {
-        var plugin = this;
-        return function(original) {
-            return function patchCancelTask(task) {
-                var currentZone = Zone.current;
-                var currentSpan = plugin._getCurrentSpan(currentZone);
-                if (currentSpan && plugin._shouldCountTask(task, currentZone)) plugin._decrementTask(currentSpan);
-                return original.call(this, task);
-            };
-        };
-    };
-    /**
-     * Patches zone schedule task - this is done to be able to correctly
-     * increment the number of tasks running within current zone but also to
-     * save time in case of timeout running from xhr plugin when waiting for
-     * main request from PerformanceResourceTiming
-     */ UserInteractionInstrumentation.prototype._patchZoneScheduleTask = function() {
-        var plugin = this;
-        return function(original) {
-            return function patchScheduleTask(task) {
-                var currentZone = Zone.current;
-                var currentSpan = plugin._getCurrentSpan(currentZone);
-                if (currentSpan && plugin._shouldCountTask(task, currentZone)) {
-                    plugin._incrementTask(currentSpan);
-                    plugin._checkForTimeout(task, currentSpan);
-                }
-                return original.call(this, task);
-            };
-        };
-    };
-    /**
-     * Patches zone run task - this is done to be able to create a span when
-     * user interaction starts
-     * @private
-     */ UserInteractionInstrumentation.prototype._patchZoneRunTask = function() {
-        var plugin = this;
-        return function(original) {
-            return function patchRunTask(task, applyThis, applyArgs) {
-                var event = Array.isArray(applyArgs) && applyArgs[0] instanceof Event ? applyArgs[0] : undefined;
-                var target = event === null || event === void 0 ? void 0 : event.target;
-                var span;
-                var activeZone = this;
-                if (target) {
-                    span = plugin._createSpan(target, task.eventName);
-                    if (span) {
-                        plugin._incrementTask(span);
-                        return activeZone.run(function() {
-                            try {
-                                return _api.context.with(_api.trace.setSpan(_api.context.active(), span), function() {
-                                    var currentZone = Zone.current;
-                                    task._zone = currentZone;
-                                    return original.call(currentZone, task, applyThis, applyArgs);
-                                });
-                            } finally{
-                                plugin._decrementTask(span);
-                            }
-                        });
-                    }
-                } else span = plugin._getCurrentSpan(activeZone);
-                try {
-                    return original.call(activeZone, task, applyThis, applyArgs);
-                } finally{
-                    if (span && plugin._shouldCountTask(task, activeZone)) plugin._decrementTask(span);
-                }
-            };
-        };
-    };
-    /**
-     * Decides if task should be counted.
-     * @param task
-     * @param currentZone
-     * @private
-     */ UserInteractionInstrumentation.prototype._shouldCountTask = function(task, currentZone) {
-        if (task._zone) currentZone = task._zone;
-        if (!currentZone || !task.data || task.data.isPeriodic) return false;
-        var currentSpan = this._getCurrentSpan(currentZone);
-        if (!currentSpan) return false;
-        if (!this._spansData.get(currentSpan)) return false;
-        return task.type === "macroTask" || task.type === "microTask";
-    };
-    /**
-     * Will try to end span when such span still exists.
-     * @param span
-     * @param endTime
-     * @private
-     */ UserInteractionInstrumentation.prototype._tryToEndSpan = function(span, endTime) {
-        if (span) {
-            var spanData = this._spansData.get(span);
-            if (spanData) {
-                span.end(endTime);
-                this._spansData.delete(span);
-            }
-        }
-    };
-    /**
-     * implements enable function
-     */ UserInteractionInstrumentation.prototype.enable = function() {
-        var _this = this;
-        var ZoneWithPrototype = this.getZoneWithPrototype();
-        this._diag.debug("applying patch to", this.moduleName, this.version, "zone:", !!ZoneWithPrototype);
-        if (ZoneWithPrototype) {
-            if ((0, _instrumentation.isWrapped)(ZoneWithPrototype.prototype.runTask)) {
-                this._unwrap(ZoneWithPrototype.prototype, "runTask");
-                this._diag.debug("removing previous patch from method runTask");
-            }
-            if ((0, _instrumentation.isWrapped)(ZoneWithPrototype.prototype.scheduleTask)) {
-                this._unwrap(ZoneWithPrototype.prototype, "scheduleTask");
-                this._diag.debug("removing previous patch from method scheduleTask");
-            }
-            if ((0, _instrumentation.isWrapped)(ZoneWithPrototype.prototype.cancelTask)) {
-                this._unwrap(ZoneWithPrototype.prototype, "cancelTask");
-                this._diag.debug("removing previous patch from method cancelTask");
-            }
-            this._zonePatched = true;
-            this._wrap(ZoneWithPrototype.prototype, "runTask", this._patchZoneRunTask());
-            this._wrap(ZoneWithPrototype.prototype, "scheduleTask", this._patchZoneScheduleTask());
-            this._wrap(ZoneWithPrototype.prototype, "cancelTask", this._patchZoneCancelTask());
-        } else {
-            this._zonePatched = false;
-            var targets = this._getPatchableEventTargets();
-            targets.forEach(function(target) {
-                if ((0, _instrumentation.isWrapped)(target.addEventListener)) {
-                    _this._unwrap(target, "addEventListener");
-                    _this._diag.debug("removing previous patch from method addEventListener");
-                }
-                if ((0, _instrumentation.isWrapped)(target.removeEventListener)) {
-                    _this._unwrap(target, "removeEventListener");
-                    _this._diag.debug("removing previous patch from method removeEventListener");
-                }
-                _this._wrap(target, "addEventListener", _this._patchAddEventListener());
-                _this._wrap(target, "removeEventListener", _this._patchRemoveEventListener());
-            });
-        }
-        this._patchHistoryApi();
-    };
-    /**
-     * implements unpatch function
-     */ UserInteractionInstrumentation.prototype.disable = function() {
-        var _this = this;
-        var ZoneWithPrototype = this.getZoneWithPrototype();
-        this._diag.debug("removing patch from", this.moduleName, this.version, "zone:", !!ZoneWithPrototype);
-        if (ZoneWithPrototype && this._zonePatched) {
-            if ((0, _instrumentation.isWrapped)(ZoneWithPrototype.prototype.runTask)) this._unwrap(ZoneWithPrototype.prototype, "runTask");
-            if ((0, _instrumentation.isWrapped)(ZoneWithPrototype.prototype.scheduleTask)) this._unwrap(ZoneWithPrototype.prototype, "scheduleTask");
-            if ((0, _instrumentation.isWrapped)(ZoneWithPrototype.prototype.cancelTask)) this._unwrap(ZoneWithPrototype.prototype, "cancelTask");
-        } else {
-            var targets = this._getPatchableEventTargets();
-            targets.forEach(function(target) {
-                if ((0, _instrumentation.isWrapped)(target.addEventListener)) _this._unwrap(target, "addEventListener");
-                if ((0, _instrumentation.isWrapped)(target.removeEventListener)) _this._unwrap(target, "removeEventListener");
-            });
-        }
-        this._unpatchHistoryApi();
-    };
-    /**
-     * returns Zone
-     */ UserInteractionInstrumentation.prototype.getZoneWithPrototype = function() {
-        var _window = window;
-        return _window.Zone;
-    };
-    return UserInteractionInstrumentation;
-}((0, _instrumentation.InstrumentationBase));
-
-},{"@opentelemetry/instrumentation":"3OTpd","@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","@opentelemetry/sdk-trace-web":"eXZZL","./enums/AttributeNames":"50VYj","./version":"6PVqs","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"50VYj":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "AttributeNames", ()=>AttributeNames);
-var AttributeNames;
-(function(AttributeNames) {
-    AttributeNames["EVENT_TYPE"] = "event_type";
-    AttributeNames["TARGET_ELEMENT"] = "target_element";
-    AttributeNames["TARGET_XPATH"] = "target_xpath";
-    AttributeNames["HTTP_URL"] = "http.url";
-})(AttributeNames || (AttributeNames = {}));
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"6PVqs":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ // this is autogenerated file, see scripts/version-update.js
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "VERSION", ()=>VERSION);
-var VERSION = "0.37.0";
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"jYPe9":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _xhr = require("./xhr");
-parcelHelpers.exportAll(_xhr, exports);
-
-},{"./xhr":"3C1i1","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"3C1i1":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "XMLHttpRequestInstrumentation", ()=>XMLHttpRequestInstrumentation);
-var _api = require("@opentelemetry/api");
-var _instrumentation = require("@opentelemetry/instrumentation");
-var _core = require("@opentelemetry/core");
-var _semanticConventions = require("@opentelemetry/semantic-conventions");
-var _sdkTraceWeb = require("@opentelemetry/sdk-trace-web");
-var _eventNames = require("./enums/EventNames");
-var _version = require("./version");
-var _attributeNames = require("./enums/AttributeNames");
-var __extends = undefined && undefined.__extends || function() {
-    var extendStatics = function(d, b) {
-        extendStatics = Object.setPrototypeOf || ({
-            __proto__: []
-        }) instanceof Array && function(d, b) {
-            d.__proto__ = b;
-        } || function(d, b) {
-            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
-        };
-        return extendStatics(d, b);
-    };
-    return function(d, b) {
-        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() {
-            this.constructor = d;
-        }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-}();
-// how long to wait for observer to collect information about resources
-// this is needed as event "load" is called before observer
-// hard to say how long it should really wait, seems like 300ms is
-// safe enough
-var OBSERVER_WAIT_TIME_MS = 300;
-/**
- * This class represents a XMLHttpRequest plugin for auto instrumentation
- */ var XMLHttpRequestInstrumentation = /** @class */ function(_super) {
-    __extends(XMLHttpRequestInstrumentation, _super);
-    function XMLHttpRequestInstrumentation(config) {
-        var _this = _super.call(this, "@opentelemetry/instrumentation-xml-http-request", (0, _version.VERSION), config) || this;
-        _this.component = "xml-http-request";
-        _this.version = (0, _version.VERSION);
-        _this.moduleName = _this.component;
-        _this._tasksCount = 0;
-        _this._xhrMem = new WeakMap();
-        _this._usedResources = new WeakSet();
-        return _this;
-    }
-    XMLHttpRequestInstrumentation.prototype.init = function() {};
-    XMLHttpRequestInstrumentation.prototype._getConfig = function() {
-        return this._config;
-    };
-    /**
-     * Adds custom headers to XMLHttpRequest
-     * @param xhr
-     * @param spanUrl
-     * @private
-     */ XMLHttpRequestInstrumentation.prototype._addHeaders = function(xhr, spanUrl) {
-        var url = (0, _sdkTraceWeb.parseUrl)(spanUrl).href;
-        if (!(0, _sdkTraceWeb.shouldPropagateTraceHeaders)(url, this._getConfig().propagateTraceHeaderCorsUrls)) {
-            var headers_1 = {};
-            _api.propagation.inject(_api.context.active(), headers_1);
-            if (Object.keys(headers_1).length > 0) this._diag.debug("headers inject skipped due to CORS policy");
-            return;
-        }
-        var headers = {};
-        _api.propagation.inject(_api.context.active(), headers);
-        Object.keys(headers).forEach(function(key) {
-            xhr.setRequestHeader(key, String(headers[key]));
-        });
-    };
-    /**
-     * Add cors pre flight child span
-     * @param span
-     * @param corsPreFlightRequest
-     * @private
-     */ XMLHttpRequestInstrumentation.prototype._addChildSpan = function(span, corsPreFlightRequest) {
-        var _this = this;
-        _api.context.with(_api.trace.setSpan(_api.context.active(), span), function() {
-            var childSpan = _this.tracer.startSpan("CORS Preflight", {
-                startTime: corsPreFlightRequest[(0, _sdkTraceWeb.PerformanceTimingNames).FETCH_START]
-            });
-            if (!_this._getConfig().ignoreNetworkEvents) (0, _sdkTraceWeb.addSpanNetworkEvents)(childSpan, corsPreFlightRequest);
-            childSpan.end(corsPreFlightRequest[(0, _sdkTraceWeb.PerformanceTimingNames).RESPONSE_END]);
-        });
-    };
-    /**
-     * Add attributes when span is going to end
-     * @param span
-     * @param xhr
-     * @param spanUrl
-     * @private
-     */ XMLHttpRequestInstrumentation.prototype._addFinalSpanAttributes = function(span, xhrMem, spanUrl) {
-        if (typeof spanUrl === "string") {
-            var parsedUrl = (0, _sdkTraceWeb.parseUrl)(spanUrl);
-            if (xhrMem.status !== undefined) span.setAttribute((0, _semanticConventions.SemanticAttributes).HTTP_STATUS_CODE, xhrMem.status);
-            if (xhrMem.statusText !== undefined) span.setAttribute((0, _attributeNames.AttributeNames).HTTP_STATUS_TEXT, xhrMem.statusText);
-            span.setAttribute((0, _semanticConventions.SemanticAttributes).HTTP_HOST, parsedUrl.host);
-            span.setAttribute((0, _semanticConventions.SemanticAttributes).HTTP_SCHEME, parsedUrl.protocol.replace(":", ""));
-            // @TODO do we want to collect this or it will be collected earlier once only or
-            //    maybe when parent span is not available ?
-            span.setAttribute((0, _semanticConventions.SemanticAttributes).HTTP_USER_AGENT, navigator.userAgent);
-        }
-    };
-    XMLHttpRequestInstrumentation.prototype._applyAttributesAfterXHR = function(span, xhr) {
-        var _this = this;
-        var applyCustomAttributesOnSpan = this._getConfig().applyCustomAttributesOnSpan;
-        if (typeof applyCustomAttributesOnSpan === "function") (0, _instrumentation.safeExecuteInTheMiddle)(function() {
-            return applyCustomAttributesOnSpan(span, xhr);
-        }, function(error) {
-            if (!error) return;
-            _this._diag.error("applyCustomAttributesOnSpan", error);
-        }, true);
-    };
-    /**
-     * will collect information about all resources created
-     * between "send" and "end" with additional waiting for main resource
-     * @param xhr
-     * @param spanUrl
-     * @private
-     */ XMLHttpRequestInstrumentation.prototype._addResourceObserver = function(xhr, spanUrl) {
-        var xhrMem = this._xhrMem.get(xhr);
-        if (!xhrMem || typeof PerformanceObserver !== "function" || typeof PerformanceResourceTiming !== "function") return;
-        xhrMem.createdResources = {
-            observer: new PerformanceObserver(function(list) {
-                var entries = list.getEntries();
-                var parsedUrl = (0, _sdkTraceWeb.parseUrl)(spanUrl);
-                entries.forEach(function(entry) {
-                    if (entry.initiatorType === "xmlhttprequest" && entry.name === parsedUrl.href) {
-                        if (xhrMem.createdResources) xhrMem.createdResources.entries.push(entry);
-                    }
-                });
-            }),
-            entries: []
-        };
-        xhrMem.createdResources.observer.observe({
-            entryTypes: [
-                "resource"
-            ]
-        });
-    };
-    /**
-     * Clears the resource timings and all resources assigned with spans
-     *     when {@link XMLHttpRequestInstrumentationConfig.clearTimingResources} is
-     *     set to true (default false)
-     * @private
-     */ XMLHttpRequestInstrumentation.prototype._clearResources = function() {
-        if (this._tasksCount === 0 && this._getConfig().clearTimingResources) {
-            (0, _core.otperformance).clearResourceTimings();
-            this._xhrMem = new WeakMap();
-            this._usedResources = new WeakSet();
-        }
-    };
-    /**
-     * Finds appropriate resource and add network events to the span
-     * @param span
-     */ XMLHttpRequestInstrumentation.prototype._findResourceAndAddNetworkEvents = function(xhrMem, span, spanUrl, startTime, endTime) {
-        if (!spanUrl || !startTime || !endTime || !xhrMem.createdResources) return;
-        var resources = xhrMem.createdResources.entries;
-        if (!resources || !resources.length) // fallback - either Observer is not available or it took longer
-        // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
-        // information
-        // ts thinks this is the perf_hooks module, but it is the browser performance api
-        resources = (0, _core.otperformance).getEntriesByType("resource");
-        var resource = (0, _sdkTraceWeb.getResource)((0, _sdkTraceWeb.parseUrl)(spanUrl).href, startTime, endTime, resources, this._usedResources);
-        if (resource.mainRequest) {
-            var mainRequest = resource.mainRequest;
-            this._markResourceAsUsed(mainRequest);
-            var corsPreFlightRequest = resource.corsPreFlightRequest;
-            if (corsPreFlightRequest) {
-                this._addChildSpan(span, corsPreFlightRequest);
-                this._markResourceAsUsed(corsPreFlightRequest);
-            }
-            if (!this._getConfig().ignoreNetworkEvents) (0, _sdkTraceWeb.addSpanNetworkEvents)(span, mainRequest);
-        }
-    };
-    /**
-     * Removes the previous information about span.
-     * This might happened when the same xhr is used again.
-     * @param xhr
-     * @private
-     */ XMLHttpRequestInstrumentation.prototype._cleanPreviousSpanInformation = function(xhr) {
-        var xhrMem = this._xhrMem.get(xhr);
-        if (xhrMem) {
-            var callbackToRemoveEvents = xhrMem.callbackToRemoveEvents;
-            if (callbackToRemoveEvents) callbackToRemoveEvents();
-            this._xhrMem.delete(xhr);
-        }
-    };
-    /**
-     * Creates a new span when method "open" is called
-     * @param xhr
-     * @param url
-     * @param method
-     * @private
-     */ XMLHttpRequestInstrumentation.prototype._createSpan = function(xhr, url, method) {
-        var _a;
-        if ((0, _core.isUrlIgnored)(url, this._getConfig().ignoreUrls)) {
-            this._diag.debug("ignoring span as url matches ignored url");
-            return;
-        }
-        var spanName = method.toUpperCase();
-        var currentSpan = this.tracer.startSpan(spanName, {
-            kind: _api.SpanKind.CLIENT,
-            attributes: (_a = {}, _a[(0, _semanticConventions.SemanticAttributes).HTTP_METHOD] = method, _a[(0, _semanticConventions.SemanticAttributes).HTTP_URL] = (0, _sdkTraceWeb.parseUrl)(url).toString(), _a)
-        });
-        currentSpan.addEvent((0, _eventNames.EventNames).METHOD_OPEN);
-        this._cleanPreviousSpanInformation(xhr);
-        this._xhrMem.set(xhr, {
-            span: currentSpan,
-            spanUrl: url
-        });
-        return currentSpan;
-    };
-    /**
-     * Marks certain [resource]{@link PerformanceResourceTiming} when information
-     * from this is used to add events to span.
-     * This is done to avoid reusing the same resource again for next span
-     * @param resource
-     * @private
-     */ XMLHttpRequestInstrumentation.prototype._markResourceAsUsed = function(resource) {
-        this._usedResources.add(resource);
-    };
-    /**
-     * Patches the method open
-     * @private
-     */ XMLHttpRequestInstrumentation.prototype._patchOpen = function() {
-        var _this = this;
-        return function(original) {
-            var plugin = _this;
-            return function patchOpen() {
-                var args = [];
-                for(var _i = 0; _i < arguments.length; _i++)args[_i] = arguments[_i];
-                var method = args[0];
-                var url = args[1];
-                plugin._createSpan(this, url, method);
-                return original.apply(this, args);
-            };
-        };
-    };
-    /**
-     * Patches the method send
-     * @private
-     */ XMLHttpRequestInstrumentation.prototype._patchSend = function() {
-        var plugin = this;
-        function endSpanTimeout(eventName, xhrMem, performanceEndTime, endTime) {
-            var callbackToRemoveEvents = xhrMem.callbackToRemoveEvents;
-            if (typeof callbackToRemoveEvents === "function") callbackToRemoveEvents();
-            var span = xhrMem.span, spanUrl = xhrMem.spanUrl, sendStartTime = xhrMem.sendStartTime;
-            if (span) {
-                plugin._findResourceAndAddNetworkEvents(xhrMem, span, spanUrl, sendStartTime, performanceEndTime);
-                span.addEvent(eventName, endTime);
-                plugin._addFinalSpanAttributes(span, xhrMem, spanUrl);
-                span.end(endTime);
-                plugin._tasksCount--;
-            }
-            plugin._clearResources();
-        }
-        function endSpan(eventName, xhr) {
-            var xhrMem = plugin._xhrMem.get(xhr);
-            if (!xhrMem) return;
-            xhrMem.status = xhr.status;
-            xhrMem.statusText = xhr.statusText;
-            plugin._xhrMem.delete(xhr);
-            if (xhrMem.span) plugin._applyAttributesAfterXHR(xhrMem.span, xhr);
-            var performanceEndTime = (0, _core.hrTime)();
-            var endTime = Date.now();
-            // the timeout is needed as observer doesn't have yet information
-            // when event "load" is called. Also the time may differ depends on
-            // browser and speed of computer
-            setTimeout(function() {
-                endSpanTimeout(eventName, xhrMem, performanceEndTime, endTime);
-            }, OBSERVER_WAIT_TIME_MS);
-        }
-        function onError() {
-            endSpan((0, _eventNames.EventNames).EVENT_ERROR, this);
-        }
-        function onAbort() {
-            endSpan((0, _eventNames.EventNames).EVENT_ABORT, this);
-        }
-        function onTimeout() {
-            endSpan((0, _eventNames.EventNames).EVENT_TIMEOUT, this);
-        }
-        function onLoad() {
-            if (this.status < 299) endSpan((0, _eventNames.EventNames).EVENT_LOAD, this);
-            else endSpan((0, _eventNames.EventNames).EVENT_ERROR, this);
-        }
-        function unregister(xhr) {
-            xhr.removeEventListener("abort", onAbort);
-            xhr.removeEventListener("error", onError);
-            xhr.removeEventListener("load", onLoad);
-            xhr.removeEventListener("timeout", onTimeout);
-            var xhrMem = plugin._xhrMem.get(xhr);
-            if (xhrMem) xhrMem.callbackToRemoveEvents = undefined;
-        }
-        return function(original) {
-            return function patchSend() {
-                var _this = this;
-                var args = [];
-                for(var _i = 0; _i < arguments.length; _i++)args[_i] = arguments[_i];
-                var xhrMem = plugin._xhrMem.get(this);
-                if (!xhrMem) return original.apply(this, args);
-                var currentSpan = xhrMem.span;
-                var spanUrl = xhrMem.spanUrl;
-                if (currentSpan && spanUrl) _api.context.with(_api.trace.setSpan(_api.context.active(), currentSpan), function() {
-                    plugin._tasksCount++;
-                    xhrMem.sendStartTime = (0, _core.hrTime)();
-                    currentSpan.addEvent((0, _eventNames.EventNames).METHOD_SEND);
-                    _this.addEventListener("abort", onAbort);
-                    _this.addEventListener("error", onError);
-                    _this.addEventListener("load", onLoad);
-                    _this.addEventListener("timeout", onTimeout);
-                    xhrMem.callbackToRemoveEvents = function() {
-                        unregister(_this);
-                        if (xhrMem.createdResources) xhrMem.createdResources.observer.disconnect();
-                    };
-                    plugin._addHeaders(_this, spanUrl);
-                    plugin._addResourceObserver(_this, spanUrl);
-                });
-                return original.apply(this, args);
-            };
-        };
-    };
-    /**
-     * implements enable function
-     */ XMLHttpRequestInstrumentation.prototype.enable = function() {
-        this._diag.debug("applying patch to", this.moduleName, this.version);
-        if ((0, _instrumentation.isWrapped)(XMLHttpRequest.prototype.open)) {
-            this._unwrap(XMLHttpRequest.prototype, "open");
-            this._diag.debug("removing previous patch from method open");
-        }
-        if ((0, _instrumentation.isWrapped)(XMLHttpRequest.prototype.send)) {
-            this._unwrap(XMLHttpRequest.prototype, "send");
-            this._diag.debug("removing previous patch from method send");
-        }
-        this._wrap(XMLHttpRequest.prototype, "open", this._patchOpen());
-        this._wrap(XMLHttpRequest.prototype, "send", this._patchSend());
-    };
-    /**
-     * implements disable function
-     */ XMLHttpRequestInstrumentation.prototype.disable = function() {
-        this._diag.debug("removing patch from", this.moduleName, this.version);
-        this._unwrap(XMLHttpRequest.prototype, "open");
-        this._unwrap(XMLHttpRequest.prototype, "send");
-        this._tasksCount = 0;
-        this._xhrMem = new WeakMap();
-        this._usedResources = new WeakSet();
-    };
-    return XMLHttpRequestInstrumentation;
-}((0, _instrumentation.InstrumentationBase));
-
-},{"@opentelemetry/api":"6AC4z","@opentelemetry/instrumentation":"3OTpd","@opentelemetry/core":"dBsXh","@opentelemetry/semantic-conventions":"lCgfj","@opentelemetry/sdk-trace-web":"eXZZL","./enums/EventNames":"2ideG","./version":"ce7eg","./enums/AttributeNames":"eLfrd","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"2ideG":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "EventNames", ()=>EventNames);
-var EventNames;
-(function(EventNames) {
-    EventNames["METHOD_OPEN"] = "open";
-    EventNames["METHOD_SEND"] = "send";
-    EventNames["EVENT_ABORT"] = "abort";
-    EventNames["EVENT_ERROR"] = "error";
-    EventNames["EVENT_LOAD"] = "loaded";
-    EventNames["EVENT_TIMEOUT"] = "timeout";
-})(EventNames || (EventNames = {}));
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"ce7eg":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ // this is autogenerated file, see scripts/version-update.js
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "VERSION", ()=>VERSION);
-var VERSION = "0.50.0";
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"eLfrd":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ /**
- * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/http.md
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "AttributeNames", ()=>AttributeNames);
-var AttributeNames;
-(function(AttributeNames) {
-    AttributeNames["HTTP_STATUS_TEXT"] = "http.status_text";
-})(AttributeNames || (AttributeNames = {}));
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"8Sk0y":[function(require,module,exports) {
+},{}],"8Sk0y":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -15455,7 +15896,7 @@ parcelHelpers.exportAll(_platform, exports);
 var _zipkin = require("./zipkin");
 parcelHelpers.exportAll(_zipkin, exports);
 
-},{"./platform":false,"./zipkin":"fgtec","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"32G3p":[function(require,module,exports) {
+},{"./platform":false,"./zipkin":"fgtec","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"32G3p":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -15475,7 +15916,7 @@ parcelHelpers.defineInteropFlag(exports);
 var _util = require("./util");
 parcelHelpers.exportAll(_util, exports);
 
-},{"./util":"lxmr7","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"lxmr7":[function(require,module,exports) {
+},{"./util":"lxmr7","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"lxmr7":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -15604,7 +16045,7 @@ function prepareSend(urlStr, headers) {
     xhr.send(data);
 }
 
-},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"fgtec":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"fgtec":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -15713,7 +16154,7 @@ var _utils = require("./utils");
     return ZipkinExporter;
 }();
 
-},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","./platform/index":"32G3p","./transform":"8smwV","@opentelemetry/semantic-conventions":"lCgfj","./utils":"kRvd5","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"8smwV":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","./platform/index":"32G3p","./transform":"8smwV","@opentelemetry/semantic-conventions":"lCgfj","./utils":"kRvd5","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"8smwV":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -15818,7 +16259,7 @@ function _toZipkinAnnotations(events) {
     });
 }
 
-},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","./types":"7VBQw","@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"7VBQw":[function(require,module,exports) {
+},{"@opentelemetry/api":"6AC4z","@opentelemetry/core":"dBsXh","./types":"7VBQw","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"7VBQw":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -15865,7 +16306,7 @@ var SpanKind;
     SpanKind["PRODUCER"] = "PRODUCER";
 })(SpanKind || (SpanKind = {}));
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}],"kRvd5":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"kRvd5":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "prepareGetHeaders", ()=>prepareGetHeaders);
@@ -15875,6 +16316,6 @@ function prepareGetHeaders(getExportRequestHeaders) {
     };
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"hzbf6"}]},["kRfeB"], "kRfeB", "parcelRequiredc15")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}]},["AscjC","kRfeB"], "kRfeB", "parcelRequiredc15")
 
 //# sourceMappingURL=index.b8ff9365.js.map

@@ -320,15 +320,24 @@
 					</table>
 				</section>
 				<section id="webapp" v-if="page == 'webapp'">
-					WEB_APP
-
-					1. Загрузить продукты
-
-					2. Добавить/Удалить продукт в корзине
-
-					3. Создать заказ
-
-					<button id="button1">button1</button>
+					<ul>
+						<li>WEB_APP</li>
+						<li>
+							<button class="button flat m-x-xs" @click="getProducts">
+								Get products
+							</button>
+						</li>
+						<li>
+							Products
+						</li>
+						<li>
+							<ul>
+								<li v-for="item in products">
+									{{ item._id }} / {{ item.name }} / {{ item.quantity }} / {{ item.price }}
+								</li>
+							</ul>
+						</li>
+					</ul>
 				</section>
 			</main>
 			<footer>
