@@ -1,6 +1,14 @@
 # moleculer-training-ground
 
-The example of integration opentelemetry to moleculer.
+Пример интеграции opentelemetry в moleculer по средством custom tracer.
+
+## Запуск
+
+Перейти в `cd moleculer`.
+Выполнить `npx parcel ./webapp/index.html --no-cache --dist-dir=./public`
+Выполнить `yarn dc:up`
+После изменения в webapp нужно заново выполнить `npx parcel ./webapp/index.html --no-cache --dist-dir=./public`
+Остановить docker compose `yarn dc:down` и заново запустить `yarn dc:up`
 
 ## Roadmap
 
