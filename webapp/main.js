@@ -482,7 +482,7 @@ const app = createApp({
 
 			propagation.inject(context.active(), headers);
 
-			console.log(headers);
+			console.log(headers, context.active());
 
 			return fetch(window.location.origin + path, {
 				method,
@@ -526,6 +526,8 @@ const app = createApp({
 				child.end();
 
 				const { rows } = await this.call("/api/product", "GET");
+
+				console.log(rows);
 
 				this.data.products = rows;
 

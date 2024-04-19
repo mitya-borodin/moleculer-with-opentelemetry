@@ -954,7 +954,7 @@ const app = createApp({
                 "Content-Type": "application/json"
             };
             (0, _api.propagation).inject((0, _api.context).active(), headers);
-            console.log(headers);
+            console.log(headers, (0, _api.context).active());
             return fetch(window.location.origin + path, {
                 method,
                 body: body ? JSON.stringify(body) : null,
@@ -982,6 +982,7 @@ const app = createApp({
                 child.setStatus((0, _api.SpanStatusCode).OK);
                 child.end();
                 const { rows } = await this.call("/api/product", "GET");
+                console.log(rows);
                 this.data.products = rows;
                 parent.addEvent("The product getting is done");
                 parent.setStatus((0, _api.SpanStatusCode).OK);
