@@ -320,24 +320,59 @@
 					</table>
 				</section>
 				<section id="webapp" v-if="page == 'webapp'">
-					<ul>
-						<li>WEB_APP</li>
-						<li>
-							<button class="button flat m-x-xs" @click="getProducts">
-								Get products
-							</button>
-						</li>
-						<li>
-							Products
-						</li>
-						<li>
-							<ul>
-								<li v-for="item in products">
+					<h1>WEB_APP</h1>
+					<div>
+						<button @click="fetchData">
+							Fetch data
+						</button>
+						<ul>
+							<li v-if="products.length > 0">PRODUCT LIST</li>
+							<li v-for="item in products" style="display: flex;
+							align-items: center;
+							width: 650px;
+							justify-content: space-between; margin-bottom: 10px;">
+								<span>{{ item._id }} / {{ item.name }} / {{ item.quantity }} / {{ item.price }}</span>
+								<button @click="addToCart(item)">ADD TO CART</button>
+							</li>
+							<div style="margin-bottom: 50px; width: 100%;"></div>
+							<div v-if="carts.length > 0">
+								<li style="display: flex;
+								align-items: center;
+								width: 300px;
+								justify-content: space-between;  margin-bottom: 10px;">
+									<span>CART LIST</span>
+
+								</li>
+
+								<li v-for="item in carts" style="display: flex;
+								align-items: center;
+								width: 700px;
+								justify-content: space-between; margin-bottom: 10px;">
+									<span>{{ item._id }} / {{ item.name }} / {{ item.quantity }} /
+										{{ item.price }}</span>
+									<button @click="removeFromCart(item._id)">REMOVE FROM CART</button>
+								</li>
+								<button @click="makeOrder(carts)" style="margin-bottom: 50px;">
+									MAKE ORDER
+								</button>
+							</div>
+							<div v-if="orders.length > 0">
+								<li style="display: flex;
+								align-items: center;
+								width: 300px;
+								justify-content: space-between;">
+									<span>ORDER LIST</span>
+								</li>
+
+								<li v-for="item in orders">
 									{{ item._id }} / {{ item.name }} / {{ item.quantity }} / {{ item.price }}
 								</li>
-							</ul>
-						</li>
-					</ul>
+								<button @click="sendOrder(orders)">
+									SEND ORDER
+								</button>
+							</div>
+						</ul>
+					</div>
 				</section>
 			</main>
 			<footer>

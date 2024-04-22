@@ -12,6 +12,11 @@ module.exports = {
 	name: "partner",
 
 	/**
+	 * Mixins
+	 */
+	mixins: [DbMixin("partner")],
+
+	/**
 	 * Actions
 	 */
 	actions: {
@@ -57,6 +62,25 @@ module.exports = {
 
 				ctx.finishSpan(spanRabbitMQ);
 			},
+		},
+	},
+	/**
+	 * Methods
+	 */
+	methods: {
+		/**
+		 * Loading sample data to the collection.
+		 * It is called in the DB.mixin after the database
+		 * connection establishing & the collection is empty.
+		 */
+		async seedDB() {
+			await this.adapter.insertMany([
+				{ name: "Volga instruments", amount: 5000, capital: 100 },
+				{ name: "ETM", amount: 4000, capital: 32 },
+				{ name: "DCK", amount: 6000, capital: 34234 },
+				{ name: "IEK", amount: 2000, capital: 435345 },
+				{ name: "EKF", amount: 3000, capital: 234234 },
+			]);
 		},
 	},
 };

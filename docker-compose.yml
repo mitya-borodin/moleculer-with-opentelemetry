@@ -17,14 +17,16 @@ services:
       - "traefik.http.services.api-gw.loadbalancer.server.port=3000"
     networks:
       - internal
+    volumes:
+      - ./public:/app/public
 
-  product:
+  car:
     build:
       context: .
     image: moleculer
     env_file: docker-compose.env
     environment:
-      SERVICES: product
+      SERVICES: car
     depends_on:
       - mongo
       - redis
@@ -70,12 +72,40 @@ services:
     networks:
       - internal
 
+  product:
+    build:
+      context: .
+    image: moleculer
+    env_file: docker-compose.env
+    environment:
+      SERVICES: product
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - internal
+
+  user:
+    build:
+      context: .
+    image: moleculer
+    env_file: docker-compose.env
+    environment:
+      SERVICES: user
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - internal
+
   mongo:
     image: mongo:4
     volumes:
       - data:/data/db
     networks:
       - internal
+    ports:
+      - '27017:27017'
 
   redis:
     image: redis:alpine

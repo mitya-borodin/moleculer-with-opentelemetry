@@ -5,10 +5,7 @@ import {
 	trace,
 } from "@opentelemetry/api";
 
-/**
- * Получения трейсера
- */
-const tracer = trace.getTracer("example-tracer-web");
+const tracer = trace.getTracer("webapp");
 
 const { createApp } = Vue;
 
@@ -59,7 +56,12 @@ const app = createApp({
 			services: [],
 			actions: {},
 			showBrokerOptions: false,
+			cars: [],
+			carts: [],
+			partners: [],
 			products: [],
+			users: [],
+			orders: [],
 		};
 	},
 	computed: {
@@ -474,20 +476,22 @@ const app = createApp({
 
 		call(path, method, body) {
 			/**
-			 * В HTTP клиенте необходимо достать контекст трассировки.
+			 * Вот тут должен быть не пустой context.active(),
+			 * чтобы на BE был передан верный tracecontext.
+			 *
+			 * Если context.active() пустой, то генерируется
+			 * tracecontext от места где выполняется fetch,
+			 * и мы не узнаем откуда был вызван данный fetch.
 			 */
-			const headers = {
-				"Content-Type": "application/json",
-			};
 
-			propagation.inject(context.active(), headers);
-
-			console.log(headers, context.active());
+			console.log(context.active());
 
 			return fetch(window.location.origin + path, {
 				method,
 				body: body ? JSON.stringify(body) : null,
-				headers,
+				headers: {
+					"Content-Type": "application/json",
+				},
 			})
 				.then((response) => response.json())
 				.catch((error) => {
@@ -496,48 +500,106 @@ const app = createApp({
 					return {};
 				});
 		},
+		async getCar() {
+			const { rows } = await this.call("/api/car?pageSize=10000", "GET");
 
+			this.$data.cars = rows;
+		},
+		async getCart() {
+			const { rows } = await this.call("/api/cart?pageSize=10000", "GET");
+
+			this.$data.carts = rows;
+		},
+		async getPartners() {
+			const { rows } = await this.call(
+				"/api/partner?pageSize=10000",
+				"GET"
+			);
+
+			this.$data.partners = rows;
+		},
 		async getProducts() {
-			const parent = tracer.startSpan("get-products");
+			const { rows } = await this.call(
+				"/api/product?pageSize=10000",
+				"GET"
+			);
 
-			parent.setAttribute("atr-1", "value-1");
-			parent.setAttribute("atr-2", "value-2");
-			parent.setAttribute("atr-3", "value-3");
+			this.$data.products = rows;
+		},
+		async getUsers() {
+			const { rows } = await this.call("/api/user?pageSize=10000", "GET");
 
-			try {
-				parent.spanContext();
+			this.$data.users = rows;
+		},
+		async getOrders() {
+			const { rows } = await this.call(
+				"/api/order?pageSize=10000",
+				"GET"
+			);
 
-				/**
-				 * Пример создания иерархии спанов.
-				 */
-				const traceContext = trace.setSpan(context.active(), parent);
-				const child = tracer.startSpan(
-					"wait-before-get-products",
-					undefined,
-					traceContext
-				);
+			this.$data.orders = rows;
+		},
 
-				await new Promise((resolve) => {
-					setTimeout(resolve, 1000);
-				});
+		/**
+		 * Эмуляция ситуации с несколькими параллельными запросами
+		 * click
+		 *  -> (async) get car -> проброс на BE
+		 *	  -> Trace from BE ...
+		 * 	  -> (sync) compute some action
+		 * 		-> (sync) compute item
+		 * 		-> (sync) compute another item
+		 *  -> (async) get cart -> проброс на BE
+		 * 	  -> Trace from BE ...
+		 * 	  -> (async) compute some action
+		 * 		-> (async) compute item
+		 * 		-> (async) compute another item
+		 *  -> (async) get partners -> проброс на BE
+		 * 	  -> Trace from BE ...
+		 *  -> (async) get products -> проброс на BE
+		 * 	  -> Trace from BE ...
+		 *	-> (async) get users -> проброс на BE
+		 *	  -> Trace from BE ...
+		 */
+		async fetchData() {
+			await Promise.all([
+				this.getCar(),
+				this.getCart(),
+				this.getPartners(),
+				this.getProducts(),
+				this.getUsers(),
+				this.getOrders(),
+			]);
+		},
 
-				child.addEvent("The waiting before get product finished");
-				child.setStatus(SpanStatusCode.OK);
-				child.end();
+		async addToCart({ _id, ...product }) {
+			await this.call("/api/cart", "POST", product);
+			await this.getCart();
+		},
+		async removeFromCart(cartId) {
+			await this.call("/api/cart/" + cartId, "DELETE", { id: cartId });
+			await this.getCart();
+		},
+		async makeOrder(carts) {
+			await Promise.all(
+				carts.map(async ({ _id, ...cart }) => {
+					await this.call("/api/cart/" + _id, "DELETE", {
+						id: _id,
+					});
+					await this.call("/api/order", "POST", cart);
+				})
+			);
 
-				const { rows } = await this.call("/api/product", "GET");
+			await this.getCart();
+			await this.getOrders();
+		},
+		async sendOrder(orders) {
+			await Promise.all(
+				orders.map(async ({ _id, ...order }) => {
+					await this.call("/api/order/" + _id, "DELETE");
+				})
+			);
 
-				console.log(rows);
-
-				this.data.products = rows;
-
-				parent.addEvent("The product getting is done");
-				parent.setStatus(SpanStatusCode.OK);
-			} catch (error) {
-				parent.setStatus(SpanStatusCode.ERROR);
-			} finally {
-				parent.end();
-			}
+			await this.getOrders();
 		},
 	},
 	mounted() {

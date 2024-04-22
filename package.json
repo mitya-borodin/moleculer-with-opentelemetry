@@ -4,12 +4,12 @@
   "description": "My Moleculer-based microservices project",
   "scripts": {
     "dev": "moleculer-runner --repl --hot services/**/*.service.js",
-    "start": "moleculer-runner",
+    "start": "moleculer-runner services/**/*.service.js",
     "cli": "moleculer connect Redis",
     "ci": "jest --watch",
     "test": "jest --coverage",
     "lint": "eslint services",
-    "dc:up": "docker-compose up --build -d",
+    "dc:up": "docker-compose up --force-recreate --build -d",
     "dc:logs": "docker-compose logs -f",
     "dc:down": "docker-compose down"
   },
@@ -19,6 +19,8 @@
   ],
   "author": "",
   "devDependencies": {
+    "assert": "^2.1.0",
+    "console-browserify": "^1.2.0",
     "eslint": "^8.25.0",
     "jest": "^27.5.1",
     "jest-cli": "^27.5.1",
