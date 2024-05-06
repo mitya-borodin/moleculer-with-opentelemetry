@@ -509,104 +509,187 @@ const app = createApp({
             if (this.page == "nodes") return this.updateNodeList();
             if (this.page == "services") return this.updateServiceList();
         },
-        call (path, method, body) {
-            /**
-			 * Вот тут должен быть не пустой context.active(),
-			 * чтобы на BE был передан верный tracecontext.
-			 *
-			 * Если context.active() пустой, то генерируется
-			 * tracecontext от места где выполняется fetch,
-			 * и мы не узнаем откуда был вызван данный fetch.
-			 */ console.log((0, _api.context).active());
-            return fetch(window.location.origin + path, {
-                method,
-                body: body ? JSON.stringify(body) : null,
-                headers: {
+        async call (path, method, body, attributes = {}) {
+            return await tracer.startActiveSpan("Call", async (span)=>{
+                span.setAttributes(attributes);
+                const headers = {
                     "Content-Type": "application/json"
-                }
-            }).then((response)=>response.json()).catch((error)=>{
-                console.error(error);
-                return {};
+                };
+                /**
+				 * https://github.com/open-telemetry/opentelemetry-js/issues/2951#issuecomment-1214587378
+				 *
+				 * Существует баг, при котором текущий контекст context.active() теряется после асинхронного действия.
+				 *
+				 * Для того, чтобы сохранить контекст, нужно использовать не документированную возможность context.bind.
+				 *
+				 * 	const call = context.bind(context.active(), this.call);
+				 *
+				 * 	await tracer.startActiveSpan("Add to cart", async (span) => {
+				 *    const call = context.bind(context.active(), this.call);
+				 *    const getCart = context.bind(context.active(), this.getCart);
+				 *
+				 *    await call("/api/cart", "POST", product, {
+				 *    	page: "webapp page",
+				 *    });
+				 *    await getCart();
+				 *
+				 *    span.end();
+				 *  });
+				 *
+				 * При помощи propagation.inject(context.active(), headers); добавляем идентификатор трассировки в заголовки
+				 * 	и отправляем на BE для дальнейшей трассировки BE части.
+				 */ (0, _api.propagation).inject((0, _api.context).active(), headers);
+                console.log(headers, (0, _api.context).active());
+                return fetch(window.location.origin + path, {
+                    method,
+                    body: body ? JSON.stringify(body) : null,
+                    headers
+                }).then((response)=>{
+                    span.addEvent("The call was finished \u2705");
+                    span.setStatus((0, _api.SpanStatusCode).OK);
+                    return response.json();
+                }).catch((error)=>{
+                    console.error(error);
+                    span.addEvent("The call was fail \uD83D\uDEA8");
+                    span.setStatus((0, _api.SpanStatusCode).ERROR);
+                    span.recordException(error);
+                    return {};
+                }).finally(()=>{
+                    span.end();
+                });
             });
         },
         async getCar () {
-            const { rows } = await this.call("/api/car?pageSize=10000", "GET");
-            this.$data.cars = rows;
+            await tracer.startActiveSpan("Get car", async (span)=>{
+                const { rows } = await this.call("/api/car?pageSize=10000", "GET");
+                this.$data.cars = rows;
+                span.end();
+            });
         },
         async getCart () {
-            const { rows } = await this.call("/api/cart?pageSize=10000", "GET");
-            this.$data.carts = rows;
+            await tracer.startActiveSpan("Get cart", async (span)=>{
+                const { rows } = await this.call("/api/cart?pageSize=10000", "GET");
+                this.$data.carts = rows;
+                span.end();
+            });
         },
         async getPartners () {
-            const { rows } = await this.call("/api/partner?pageSize=10000", "GET");
-            this.$data.partners = rows;
+            await tracer.startActiveSpan("Get partners", async (span)=>{
+                const { rows } = await this.call("/api/partner?pageSize=10000", "GET");
+                this.$data.partners = rows;
+                span.end();
+            });
         },
         async getProducts () {
-            const { rows } = await this.call("/api/product?pageSize=10000", "GET");
-            this.$data.products = rows;
+            await tracer.startActiveSpan("Get products", async (span)=>{
+                const { rows } = await this.call("/api/product?pageSize=10000", "GET");
+                this.$data.products = rows;
+                span.end();
+            });
         },
         async getUsers () {
-            const { rows } = await this.call("/api/user?pageSize=10000", "GET");
-            this.$data.users = rows;
+            await tracer.startActiveSpan("Get users", async (span)=>{
+                const { rows } = await this.call("/api/user?pageSize=10000", "GET");
+                this.$data.users = rows;
+                span.end();
+            });
         },
         async getOrders () {
-            const { rows } = await this.call("/api/order?pageSize=10000", "GET");
-            this.$data.orders = rows;
+            await tracer.startActiveSpan("Get orders", async (span)=>{
+                const { rows } = await this.call("/api/order?pageSize=10000", "GET");
+                this.$data.orders = rows;
+                span.setStatus((0, _api.SpanStatusCode).OK);
+                span.end();
+            });
         },
-        /**
-		 * Эмуляция ситуации с несколькими параллельными запросами
-		 * click
-		 *  -> (async) get car -> проброс на BE
-		 *	  -> Trace from BE ...
-		 * 	  -> (sync) compute some action
-		 * 		-> (sync) compute item
-		 * 		-> (sync) compute another item
-		 *  -> (async) get cart -> проброс на BE
-		 * 	  -> Trace from BE ...
-		 * 	  -> (async) compute some action
-		 * 		-> (async) compute item
-		 * 		-> (async) compute another item
-		 *  -> (async) get partners -> проброс на BE
-		 * 	  -> Trace from BE ...
-		 *  -> (async) get products -> проброс на BE
-		 * 	  -> Trace from BE ...
-		 *	-> (async) get users -> проброс на BE
-		 *	  -> Trace from BE ...
-		 */ async fetchData () {
-            await Promise.all([
-                this.getCar(),
-                this.getCart(),
-                this.getPartners(),
-                this.getProducts(),
-                this.getUsers(),
-                this.getOrders()
-            ]);
+        async fetchData () {
+            await tracer.startActiveSpan("Fetch data", async (span)=>{
+                /**
+				 * Тут не делается const call = context.bind(context.active(), this.call);
+				 *
+				 * Так как все вызывается синхронное, и контекст передается нормально.
+				 */ await Promise.all([
+                    this.getCar(),
+                    this.getCart(),
+                    this.getPartners(),
+                    this.getProducts(),
+                    this.getUsers(),
+                    this.getOrders()
+                ]);
+                /**
+				 * Чтобы посмотреть как выглядит ERROR
+				 */ span.setStatus((0, _api.SpanStatusCode).ERROR);
+                span.end();
+            });
         },
         async addToCart ({ _id, ...product }) {
-            await this.call("/api/cart", "POST", product);
-            await this.getCart();
+            /**
+			 * Если нужно сделать вложенные спаны:
+			 * 1. Создаем корень tracer.startActiveSpan("ROOT SPAN NAME", async (span) => {});
+			 * 2. Внутри все асинхронные методы нужно забиндить на текущий контекст
+			 * 	const call = context.bind(context.active(), this.call);
+			 *	const getCart = context.bind(context.active(), this.getCart);
+			 * 3. Внутри асинхронного метода можно вызывать
+			 * 	tracer.startActiveSpan("CHILD SPAN NAME", async (span) => {});, он создаст дочерний спан,
+			 * 	относительно самого верхнего tracer.startActiveSpan("ROOT SPAN NAME", async (span) => {});
+			 * 4. Если внутри getCart есть несколько последовательных действий, необходимо будет выполнить для них
+			 * 	пункт 2, 3
+			 * 5. Для реализации любой вложенности стоит повторять такие операции.
+			 */ await tracer.startActiveSpan("Add to cart", async (span)=>{
+                const call = (0, _api.context).bind((0, _api.context).active(), this.call);
+                const getCart = (0, _api.context).bind((0, _api.context).active(), this.getCart);
+                await call("/api/cart", "POST", product, {
+                    page: "webapp page"
+                });
+                await getCart();
+                span.addEvent("The adding to cart was finished \u2705");
+                span.addEvent("The adding to cart was finished 2 \u2705");
+                span.setStatus((0, _api.SpanStatusCode).OK);
+                span.end();
+            });
         },
         async removeFromCart (cartId) {
-            await this.call("/api/cart/" + cartId, "DELETE", {
-                id: cartId
+            await tracer.startActiveSpan("Remove from cart", async (span)=>{
+                const call = (0, _api.context).bind((0, _api.context).active(), this.call);
+                const getCart = (0, _api.context).bind((0, _api.context).active(), this.getCart);
+                await call("/api/cart/" + cartId, "DELETE", {
+                    id: cartId
+                });
+                await getCart();
+                span.addEvent("The removing from cart was finished \u2705");
+                span.setStatus((0, _api.SpanStatusCode).OK);
+                span.end();
             });
-            await this.getCart();
         },
         async makeOrder (carts) {
-            await Promise.all(carts.map(async ({ _id, ...cart })=>{
-                await this.call("/api/cart/" + _id, "DELETE", {
-                    id: _id
-                });
-                await this.call("/api/order", "POST", cart);
-            }));
-            await this.getCart();
-            await this.getOrders();
+            await tracer.startActiveSpan("Make order", async (span)=>{
+                const call = (0, _api.context).bind((0, _api.context).active(), this.call);
+                const getCart = (0, _api.context).bind((0, _api.context).active(), this.getCart);
+                const getOrders = (0, _api.context).bind((0, _api.context).active(), this.getOrders);
+                await Promise.all(carts.map(async ({ _id, ...cart })=>{
+                    await call("/api/cart/" + _id, "DELETE", {
+                        id: _id
+                    });
+                    await call("/api/order", "POST", cart);
+                }));
+                await getCart();
+                await getOrders();
+                span.addEvent("The making order was finished \u2705");
+                span.setStatus((0, _api.SpanStatusCode).OK);
+                span.end();
+            });
         },
         async sendOrder (orders) {
-            await Promise.all(orders.map(async ({ _id, ...order })=>{
-                await this.call("/api/order/" + _id, "DELETE");
-            }));
-            await this.getOrders();
+            await tracer.startActiveSpan("Send order", async (span)=>{
+                const call = (0, _api.context).bind((0, _api.context).active(), this.call);
+                const getOrders = (0, _api.context).bind((0, _api.context).active(), this.getOrders);
+                await Promise.all(orders.map(async ({ _id, ...order })=>{
+                    await call("/api/order/" + _id, "DELETE");
+                }));
+                await getOrders();
+                span.setStatus((0, _api.SpanStatusCode).UNSET);
+                span.end();
+            });
         }
     },
     mounted () {

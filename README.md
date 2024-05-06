@@ -4,11 +4,14 @@
 
 ## Запуск
 
-Выполнить `npx parcel ./webapp/index.html --no-cache --no-hmr --dist-dir=./public`
+Выполнить `npx parcel ./webapp/index.html --no-cache --no-hmr --dist-dir=./public`.
 В соседнем терминале.
-Выполнить `yarn dc:up`
-После изменения в webapp нужно заново выполнить `npx parcel ./webapp/index.html --no-cache --dist-dir=./public`
-Остановить docker compose `yarn dc:down` и заново запустить `yarn dc:up`
+Выполнить `yarn dc:up`.
+Запуск завершен, можно работать `http://localhost:3000` и `http://localhost:9411/zipkin`
+
+Чтобы обновления кода BE попали в контейнеры нужно выполнять  `yarn dc:up`.
+
+После окончания работ выключить контейнеры docker compose `yarn dc:down` и остановить процесс `parcel`.
 
 ## Roadmap
 

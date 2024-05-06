@@ -32,6 +32,6 @@ provider.register({
 	contextManager: new ZoneContextManager(),
 });
 
-registerInstrumentations({
-	instrumentations: [getWebAutoInstrumentations()],
-});
+// registerInstrumentations({
+// 	instrumentations: [getWebAutoInstrumentations()],
+// });
