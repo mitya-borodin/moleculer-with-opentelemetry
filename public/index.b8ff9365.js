@@ -168,9 +168,12 @@ provider.addSpanProcessor(new (0, _sdkTraceBase.BatchSpanProcessor)(exporter, {
 }));
 provider.register({
     contextManager: new (0, _contextZone.ZoneContextManager)()
-}); // registerInstrumentations({
- // 	instrumentations: [getWebAutoInstrumentations()],
- // });
+});
+(0, _instrumentation.registerInstrumentations)({
+    instrumentations: [
+        (0, _autoInstrumentationsWeb.getWebAutoInstrumentations)()
+    ]
+});
 
 },{"@opentelemetry/auto-instrumentations-web":"dZ0bF","@opentelemetry/context-zone":"cmUfS","@opentelemetry/exporter-zipkin":"8Sk0y","@opentelemetry/instrumentation":"3OTpd","@opentelemetry/sdk-trace-base":"jj5uM","@opentelemetry/sdk-trace-web":"eXZZL","@opentelemetry/resources":"loqSh","@opentelemetry/semantic-conventions":"lCgfj"}],"dZ0bF":[function(require,module,exports) {
 /*
@@ -10502,7 +10505,7 @@ parcelHelpers.exportAll(_typesInternal, exports);
 var _utils = require("./utils");
 parcelHelpers.exportAll(_utils, exports);
 
-},{"./autoLoader":"4D6OU","./platform/index":"lLPwY","./instrumentationNodeModuleDefinition":"7qBNT","./instrumentationNodeModuleFile":"813xk","./types":"jnhcd","./types_internal":"98zfe","./utils":"3YarC","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"4D6OU":[function(require,module,exports) {
+},{"./autoLoader":"4D6OU","./platform/index":"lLPwY","./instrumentationNodeModuleDefinition":false,"./instrumentationNodeModuleFile":false,"./types":false,"./types_internal":false,"./utils":"3YarC","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"4D6OU":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -10858,7 +10861,7 @@ parcelHelpers.export(exports, "normalize", ()=>(0, _noopNormalize.normalize));
 var _instrumentation = require("./instrumentation");
 var _noopNormalize = require("./noop-normalize");
 
-},{"./instrumentation":"hCn2q","./noop-normalize":"IZJ9q","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"hCn2q":[function(require,module,exports) {
+},{"./instrumentation":"hCn2q","./noop-normalize":false,"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"hCn2q":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -11136,135 +11139,7 @@ shimmer.unwrap = unwrap;
 shimmer.massUnwrap = massUnwrap;
 module.exports = shimmer;
 
-},{}],"IZJ9q":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-/**
- * Placeholder normalize function to replace the node variant in browser runtimes,
- * this should never be called and will perform a no-op and warn if it is called regardless.
- *
- * This is a workaround to fix https://github.com/open-telemetry/opentelemetry-js/issues/4373 until the instrumentation
- * package can be made node-only.
- *
- * @param path input path
- * @return unmodified path
- * @internal
- */ parcelHelpers.export(exports, "normalize", ()=>normalize);
-var _api = require("@opentelemetry/api");
-function normalize(path) {
-    (0, _api.diag).warn("Path normalization is not implemented for this platform. To silence this warning, ensure no node-specific instrumentations are loaded, and node-specific types (e.g. InstrumentationNodeModuleFile), are not used in a browser context)");
-    return path;
-}
-
-},{"@opentelemetry/api":"6AC4z","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"7qBNT":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "InstrumentationNodeModuleDefinition", ()=>InstrumentationNodeModuleDefinition);
-var InstrumentationNodeModuleDefinition = /** @class */ function() {
-    function InstrumentationNodeModuleDefinition(name, supportedVersions, patch, unpatch, files) {
-        this.name = name;
-        this.supportedVersions = supportedVersions;
-        this.patch = patch;
-        this.unpatch = unpatch;
-        this.files = files || [];
-    }
-    return InstrumentationNodeModuleDefinition;
-}();
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"813xk":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "InstrumentationNodeModuleFile", ()=>InstrumentationNodeModuleFile);
-var _index = require("./platform/index");
-var InstrumentationNodeModuleFile = /** @class */ function() {
-    function InstrumentationNodeModuleFile(name, supportedVersions, patch, unpatch) {
-        this.supportedVersions = supportedVersions;
-        this.patch = patch;
-        this.unpatch = unpatch;
-        this.name = (0, _index.normalize)(name);
-    }
-    return InstrumentationNodeModuleFile;
-}();
-
-},{"./platform/index":"lLPwY","@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"jnhcd":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"98zfe":[function(require,module,exports) {
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"9hRtR"}],"3YarC":[function(require,module,exports) {
+},{}],"3YarC":[function(require,module,exports) {
 /*
  * Copyright The OpenTelemetry Authors
  *
